@@ -1,0 +1,7 @@
+export function getDateISO() {
+    let yourDate = new Date()
+    yourDate.toISOString().split( '.' )[ 0 ]
+    const offset = yourDate.getTimezoneOffset()
+    yourDate = new Date(yourDate.getTime() - (offset*60*1000))
+    return yourDate.toISOString().split('.')[0]
+}
