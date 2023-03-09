@@ -10,7 +10,7 @@ export class TwitchMessages {
 
     startClient() {
         const client = new tmi.Client( {
-            channels: [ 'trinity' ],
+            channels: [ 'patchook' ],
             options: {
                 skipMembership: false
             }
@@ -18,33 +18,43 @@ export class TwitchMessages {
 
         client.connect();
 
-        client.on( 'message', this.messageCallback.bind(this) );
+        client.on( 'message', this.messageCallback.bind( this ) );
     }
 
     async messageCallback( channel, tags, message, self ) {
         const username = tags[ 'display-name' ]
         const timestamp = tags[ 'tmi-sent-ts' ]
-        const regex = new RegExp( /[A-Za-z0-9+-éèàùâûê%ç&*@)(\/\\=:?!'" ]/, 'gm' )
+        const regex = new RegExp( /[A-Za-z0-9+-éèàùâûê%ç&*@ô)(\/\\=:?!'" ]/, 'gm' )
         const formattedMessage = message.match( regex ).join( '' )
 
-        if(!this.isValidMessage(username, formattedMessage)) {
+        if ( !this.isValidMessage( username, formattedMessage ) ) {
             return
         }
 
-        console.log( formattedMessage )
-        // const completion = await openAIGateway.getCompletion(`Le viewer "${username}" dit dans le tchat Twitch: "${prompt}" et Mori répond: `, username)
-        // const completionText = completion.data.choices[0].text.match(regex).join('')
-        // completionLogger.writeCompletion(prompt, completionText)
+        // const completion = await this.openAIGateway.getCompletion( `Le viewer "${ username }" dit dans le tchat Twitch: "${ formattedMessage }" et Mori répond: `, username )
+        const completion = await this.openAIGateway.getChatCompletion( formattedMessage, username )
+        const completionTextMatches = completion.data.choices[ 0 ].message.content.match( regex )
+        if ( !completionTextMatches || completionTextMatches.length === 0 ) {
+            return
+        }
+
+        const completionText = completionTextMatches.join( '' )
+        this.completionLogger.writeCompletion( formattedMessage, completionText )
     }
 
-    isValidMessage(username, message) {
-        const usernameDenies = [ 'Moobot', 'WizeBot' ]
-
-        if ( usernameDenies.some( ud => username.includes( ud ) ) ) {
+    isValidMessage( username, message ) {
+        if ( message.length > 100 ) {
             return
         }
 
-        if ( message[ 0 ] == '@' ) {
+        const usernameDenies = [ 'Moobot', 'WizeBot' ]
+
+        if ( usernameDenies.some( u => username.includes( u ) ) ) {
+            return
+        }
+
+        const firstCharDenies = [ '@', '!', '/' ]
+        if ( firstCharDenies.some( c => message[ 0 ].includes( c ) ) ) {
             return
         }
 
