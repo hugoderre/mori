@@ -1,4 +1,4 @@
-import { TwitchMessages } from "./app/twitch.js";
+import { TmiApiClient } from "./app/tmi.js";
 
-const tm = new TwitchMessages()
+const tm = new TmiApiClient()
 tm.startClient()
