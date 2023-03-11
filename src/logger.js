@@ -1,8 +1,8 @@
-import fs from 'fs'
-import util from 'util'
-import { getDateISO } from './utils.js'
+const fs = require('fs')
+const util = require('util')
+const { getDateISO } = require('./utils')
 
-export class CompletionLogger {
+class CompletionLogger {
     constructor() {
         this.logFile = fs.createWriteStream(`./data/completion${getDateISO()}.tsv`, {flags : 'w'})
         this.logFile.write(util.format("prompt\tcompletion") + '\n');
@@ -12,3 +12,5 @@ export class CompletionLogger {
         this.logFile.write(util.format(prompt + '\t' + completion) + '\n');
     }
 }
+
+module.exports = CompletionLogger

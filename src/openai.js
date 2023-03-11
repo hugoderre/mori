@@ -1,12 +1,12 @@
-import { Configuration, OpenAIApi } from "openai";
-import { VoiceMakerAPI } from './voicemaker.js';
-import { CompletionLogger } from './logger.js';
-import { sha256 } from "js-sha256";
-import { escapeSpecialChars } from "./utils.js";
-import dotenv from 'dotenv'
+const { Configuration, OpenAIApi } = require( 'openai' )
+const VoiceMakerAPI = require( './voicemaker.js' )
+const CompletionLogger = require( './logger.js' )
+const { sha256 } = require( 'js-sha256' )
+const { escapeSpecialChars } = require( './utils.js' )
+const dotenv = require( 'dotenv' )
 dotenv.config()
 
-export class OpenAIApiClient {
+class OpenAIApiClient {
     constructor() {
         this.api = this.getApi()
         this.completionLogger = new CompletionLogger()
@@ -39,3 +39,5 @@ export class OpenAIApiClient {
         return completion
     }
 }
+
+module.exports = OpenAIApiClient

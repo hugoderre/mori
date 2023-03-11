@@ -1,7 +1,8 @@
-import dotenv from 'dotenv'
+const io = require('socket.io-client')
+const dotenv = require('dotenv')
 dotenv.config()
 
-export class StreamlabsApiClient {
+class StreamlabsApiClient {
     constructor( openAIApiClient ) {
         this.openAIApiClient = openAIApiClient
     }
@@ -42,3 +43,5 @@ export class StreamlabsApiClient {
         socket.connect();
     }
 }
+
+module.exports = StreamlabsApiClient

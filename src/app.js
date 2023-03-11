@@ -1,8 +1,8 @@
-import { OpenAIApiClient } from "./openai.js"
-import { StreamlabsApiClient } from "./streamlabs.js"
-import { TmiApiClient } from "./tmi.js"
+const OpenAIApiClient  = require('./openai.js')
+const StreamlabsApiClient = require('./streamlabs.js')
+const TmiApiClient = require('./tmi.js')
 
-export default class App {
+class App {
     constructor() {
         this.openAIApiClient = new OpenAIApiClient()
         this.tmi = new TmiApiClient(this.openAIApiClient)
@@ -11,3 +11,5 @@ export default class App {
         this.streamlabs.runSocket()
     }
 }
+
+module.exports = App

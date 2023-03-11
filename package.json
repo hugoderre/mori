@@ -3,7 +3,6 @@
   "description": "",
   "version": "1.0.1",
   "main": "index.js",
-  "type": "module",
   "scripts": {
     "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"

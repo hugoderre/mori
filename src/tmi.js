@@ -1,8 +1,8 @@
-import tmi from 'tmi.js'
-import { escapeSpecialChars } from './utils.js';
+const tmi = require( 'tmi.js' )
+const { escapeSpecialChars } = require( './utils.js' )
 
-export class TmiApiClient {
-    constructor(openAIApiClient) {
+class TmiApiClient {
+    constructor( openAIApiClient ) {
         this.openAIApiClient = openAIApiClient
     }
 
@@ -13,13 +13,13 @@ export class TmiApiClient {
 
         client.connect();
 
-        client.on( 'message', this.messageCallback.bind( this ) );
-        client.on( 'cheer', this.cheerCallback.bind( this ) );
-        client.on( 'sub', this.subCallback.bind( this ) );
-        client.on( 'resub', this.resubCallback.bind( this ) );
-        client.on( 'subgift', this.subgiftCallback.bind( this ) );
-        client.on( 'anonsubgift', this.anonsubgiftCallback.bind( this ) );
-        client.on( 'raid', this.raidCallback.bind( this ) );
+        // client.on( 'message', this.messageCallback.bind( this ) );
+        // client.on( 'cheer', this.cheerCallback.bind( this ) );
+        // client.on( 'sub', this.subCallback.bind( this ) );
+        // client.on( 'resub', this.resubCallback.bind( this ) );
+        // client.on( 'subgift', this.subgiftCallback.bind( this ) );
+        // client.on( 'anonsubgift', this.anonsubgiftCallback.bind( this ) );
+        // client.on( 'raid', this.raidCallback.bind( this ) );
     }
 
     async messageCallback( channel, tags, message, self ) {
@@ -31,9 +31,9 @@ export class TmiApiClient {
             return
         }
 
-        await this.openAIApiClient.getChatCompletion( 
-            `En respectant les règles de Twitch, réponds de façon courte et à la première personne comme Mori (streameuse Twitch) répondrait ou réagirait au viewer "${username}" qui écrit cela dans le tchat: "${fMessage}"`, 
-            username 
+        await this.openAIApiClient.getChatCompletion(
+            `En respectant les règles de Twitch, réponds de façon courte et à la première personne comme Mori (streameuse Twitch) répondrait ou réagirait au viewer "${ username }" qui écrit cela dans le tchat: "${ fMessage }"`,
+            username
         )
     }
 
@@ -46,7 +46,7 @@ export class TmiApiClient {
 
     async cheerCallback( channel, tags, message ) {
         await this.openAIApiClient.getChatCompletion(
-            `Mori, le viewer "${ tags.username }" vient d'offrir ${tags.bits} bits à ta chaine Twitch. Remerçie le chaleureusement et de façon conçise.`,
+            `Mori, le viewer "${ tags.username }" vient d'offrir ${ tags.bits } bits à ta chaine Twitch. Remerçie le chaleureusement et de façon conçise.`,
             username
         )
     }
@@ -80,7 +80,7 @@ export class TmiApiClient {
     }
 
     async raidCallback( channel, username, viewers, tags ) {
-        console.log(channel, username, viewers, tags)
+        console.log( channel, username, viewers, tags )
         await this.openAIApiClient.getChatCompletion(
             `Mori, tu viens de recevoir un raid sur ta chaine Twitch de la part de ${ username }, remerçie le et souhaite la bienvenue aux ${ viewers } viewers !`,
             username
@@ -106,6 +106,8 @@ export class TmiApiClient {
         return true
     }
 }
+
+module.exports = TmiApiClient
 
 
 
