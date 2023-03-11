@@ -29,6 +29,7 @@
     "passport": "^0.3.2",
     "passport-oauth": "^1.0.0",
     "request": "^2.81.0",
+    "socket.io-client": "^2.*",
     "tmi.js": "^1.8.5",
     "voicemaker": "^0.2.4"
   }

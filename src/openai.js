@@ -2,8 +2,8 @@ import { Configuration, OpenAIApi } from "openai";
 import { VoiceMakerAPI } from './voicemaker.js';
 import { CompletionLogger } from './logger.js';
 import { sha256 } from "js-sha256";
-import dotenv from 'dotenv'
 import { escapeSpecialChars } from "./utils.js";
+import dotenv from 'dotenv'
 dotenv.config()
 
 export class OpenAIApiClient {

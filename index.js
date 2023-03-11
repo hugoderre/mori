@@ -1,4 +1,4 @@
-import { TmiApiClient } from "./app/tmi.js";
+import App from "./src/app.js";
 
-const tm = new TmiApiClient()
-tm.startClient()
+new App()
+

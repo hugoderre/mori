@@ -1,10 +1,9 @@
 import tmi from 'tmi.js'
-import { OpenAIApiClient } from './openai.js';
 import { escapeSpecialChars } from './utils.js';
 
 export class TmiApiClient {
-    constructor() {
-        this.openAIApiClient = new OpenAIApiClient()
+    constructor(openAIApiClient) {
+        this.openAIApiClient = openAIApiClient
     }
 
     startClient() {
@@ -81,6 +80,7 @@ export class TmiApiClient {
     }
 
     async raidCallback( channel, username, viewers, tags ) {
+        console.log(channel, username, viewers, tags)
         await this.openAIApiClient.getChatCompletion(
             `Mori, tu viens de recevoir un raid sur ta chaine Twitch de la part de ${ username }, remerçie le et souhaite la bienvenue aux ${ viewers } viewers !`,
             username
