@@ -31,6 +31,7 @@
     "request": "^2.81.0",
     "socket.io-client": "^2.*",
     "tmi.js": "^1.8.5",
+    "validator": "^13.9.0",
     "voicemaker": "^0.2.4"
   }
 }
