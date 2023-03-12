@@ -3,8 +3,8 @@ const dotenv = require( 'dotenv' )
 dotenv.config()
 
 class StreamlabsApiClient {
-    constructor( openAIApiClient ) {
-        this.openAIApiClient = openAIApiClient
+    constructor( OpenAIClient ) {
+        this.OpenAIClient = OpenAIClient
     }
 
     async runSocket() {
@@ -16,21 +16,27 @@ class StreamlabsApiClient {
             console.log( 'Connecté au serveur WebSocket Streamlabs' )
         } )
 
-        socket.on( 'event', ( eventData ) => {
+        socket.on( 'event', async ( eventData ) => {
 
             switch ( eventData.type ) {
                 case 'follow':
-                    //code to handle follow events
-                    this.openAIApiClient.runChatCompletion(
-                        `Mori, le viewer "${eventData.message[0].name}" vient de follow ta chaine twitch ! Souhaite lui la bienvenue de façon concise.`,
-                        0.9,
-                        ''
+                    await this.OpenAIClient.queueUpPrompt(
+                        {
+                            text: `Mori, le viewer "${ eventData.message[ 0 ].name }" vient de follow ta chaine twitch ! Souhaite lui la bienvenue de façon concise.`,
+                            temperature: 0.9,
+                            username: ''
+                        },
+                        0.5
                     )
                     break
-                case 'donation': 
-                    this.openAIApiClient.runChatCompletion(
-                        `Mori, le viewer "${eventData.message[0].name}" vient de donner ${eventData.message[0].formatted_amount} à ta chaine Twitch ! Remercie le très chaleureuse.`,
-                        0.8
+                case 'donation':
+                    await this.OpenAIClient.queueUpPrompt(
+                        {
+                            text: `Mori, le viewer "${ eventData.message[ 0 ].name }" vient de donner ${ eventData.message[ 0 ].formatted_amount } à ta chaine Twitch ! Remercie le très chaleureuse.`,
+                            temperature: 0.8,
+                            username: ''
+                        },
+                        1
                     )
                     break
                 default:
