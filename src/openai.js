@@ -20,7 +20,7 @@ class OpenAIApiClient {
         return new OpenAIApi( configuration );
     }
 
-    async getChatCompletion( prompt, username = '' ) {
+    async runChatCompletion( prompt, temperature, username = '' ) {
         const completionObj = await this.api.createChatCompletion( {
             model: process.env.OPENAI_CHAT_MODEL,
             messages: [
@@ -28,7 +28,7 @@ class OpenAIApiClient {
                 { "role": 'user', "content": prompt }
             ],
             max_tokens: 80,
-            temperature: 0.7,
+            temperature,
             user: username ? sha256( username ) : ''
         } );
 
@@ -37,6 +37,19 @@ class OpenAIApiClient {
         this.voiceMakerAPI.sayInProcess( completion )
 
         return completion
+    }
+
+    listenCustomPrompt(expressApp) {
+        expressApp.post( '/custom-prompt', async ( req, res ) => {
+            const text = req.body.text
+            const temperature = req.body.temperature
+            if(!text || !temperature) return
+            await this.runChatCompletion(
+                text,
+                temperature
+            )
+            return res.send('Custom prompt done')
+        } )
     }
 }
 

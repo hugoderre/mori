@@ -31,58 +31,66 @@ class TmiApiClient {
             return
         }
 
-        await this.openAIApiClient.getChatCompletion(
+        await this.openAIApiClient.runChatCompletion(
             `En respectant les règles de Twitch, réponds de façon courte et à la première personne comme Mori (streameuse Twitch) répondrait ou réagirait au viewer "${ username }" qui écrit cela dans le tchat: "${ fMessage }"`,
+            0.5,
             username
         )
     }
 
     async subCallback( channel, username, methods, msg, tags ) {
-        await this.openAIApiClient.getChatCompletion(
+        await this.openAIApiClient.runChatCompletion(
             `Mori, le viewer "${ username }" vient de s'abonner à ta chaine Twitch pour la première fois. Remerçie le chaleureusement et de façon conçise.`,
+            0.5,
             username
         )
     }
 
     async cheerCallback( channel, tags, message ) {
-        await this.openAIApiClient.getChatCompletion(
+        await this.openAIApiClient.runChatCompletion(
             `Mori, le viewer "${ tags.username }" vient d'offrir ${ tags.bits } bits à ta chaine Twitch. Remerçie le chaleureusement et de façon conçise.`,
+            0.5,
             username
         )
     }
 
     async resubCallback( channel, username, streakMonths, msg, tags, methods ) {
-        await this.openAIApiClient.getChatCompletion(
+        await this.openAIApiClient.runChatCompletion(
             `Mori, le viewer "${ username }" vient de se réabonner à ta chaine Twitch. C'est son ${ tags[ 'badge-info' ].subscriber }ème mois d'abonnement. Remerçie le chaleureusement et de façon conçise.`,
+            0.5,
             username
         )
     }
 
     async subgiftCallback( channel, username, streakMonths, recipient, methods, tags ) {
-        await this.openAIApiClient.getChatCompletion(
+        await this.openAIApiClient.runChatCompletion(
             `Mori, le viewer "${ username }" vient d'offrir un abonnement cadeau à ${ recipient } à ta chaine Twitch. Remerçie ${ username } chaleureusement et de façon conçise.`,
+            0.5,
             username
         )
     }
 
     async anonsubgiftCallback( channel, streakMonths, recipient, methods, tags ) {
-        await this.openAIApiClient.getChatCompletion(
+        await this.openAIApiClient.runChatCompletion(
             `Mori, un viewer anonyme vient d'offrir un abonnement cadeau à ${ recipient } à ta chaine Twitch. Remerçie ce viewer anonyme chaleureusement et de façon conçise.`,
+            0.5,
             username
         )
     }
 
     async anonsubgiftCallback( channel, streakMonths, recipient, methods, tags ) {
-        await this.openAIApiClient.getChatCompletion(
+        await this.openAIApiClient.runChatCompletion(
             `Mori, un viewer anonyme vient d'offrir un abonnement cadeau à ${ recipient } à ta chaine Twitch. Remerçie ce viewer anonyme chaleureusement et de façon conçise.`,
+            0.5,
             username
         )
     }
 
     async raidCallback( channel, username, viewers, tags ) {
         console.log( channel, username, viewers, tags )
-        await this.openAIApiClient.getChatCompletion(
+        await this.openAIApiClient.runChatCompletion(
             `Mori, tu viens de recevoir un raid sur ta chaine Twitch de la part de ${ username }, remerçie le et souhaite la bienvenue aux ${ viewers } viewers !`,
+            0.5,
             username
         )
     }
@@ -108,13 +116,3 @@ class TmiApiClient {
 }
 
 module.exports = TmiApiClient
-
-
-
-
-
-
-
-
-
-

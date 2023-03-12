@@ -1,5 +1,5 @@
-const io = require('socket.io-client')
-const dotenv = require('dotenv')
+const io = require( 'socket.io-client' )
+const dotenv = require( 'dotenv' )
 dotenv.config()
 
 class StreamlabsApiClient {
@@ -8,39 +8,38 @@ class StreamlabsApiClient {
     }
 
     async runSocket() {
-        const socket = io( `https://sockets.streamlabs.com?token=${process.env.STREAMLABS_SOCKET_TOKEN}`, {
+        const socket = io( `https://sockets.streamlabs.com?token=${ process.env.STREAMLABS_SOCKET_TOKEN }`, {
             transports: [ 'websocket' ]
         } )
-        
+
         socket.on( 'connect', () => {
-            console.log( 'Connecté au serveur WebSocket Streamlabs' );
-        } );
+            console.log( 'Connecté au serveur WebSocket Streamlabs' )
+        } )
 
         socket.on( 'event', ( eventData ) => {
-            console.log( 'Notification reçue :', eventData );
 
-            if ( !eventData.for && eventData.type === 'donation' ) {
-                console.log( 'Une donation a été effectuée !' );
-                console.log( 'Montant :', eventData.message[ 0 ].amount );
-                console.log( 'Nom de l\'utilisateur :', eventData.message[ 0 ].from );
+            switch ( eventData.type ) {
+                case 'follow':
+                    //code to handle follow events
+                    this.openAIApiClient.runChatCompletion(
+                        `Mori, le viewer "${eventData.message[0].name}" vient de follow ta chaine twitch ! Souhaite lui la bienvenue de façon concise.`,
+                        0.9,
+                        ''
+                    )
+                    break
+                case 'donation': 
+                    this.openAIApiClient.runChatCompletion(
+                        `Mori, le viewer "${eventData.message[0].name}" vient de donner ${eventData.message[0].formatted_amount} à ta chaine Twitch ! Remercie le très chaleureuse.`,
+                        0.8
+                    )
+                    break
+                default:
+                    console.log( eventData.message )
+                    break
             }
-            if ( eventData.for === 'twitch_account' ) {
-                switch ( eventData.type ) {
-                    case 'follow':
-                        //code to handle follow events
-                        console.log( eventData.message );
-                        break;
-                    // case 'subscription':
-                    //     //code to handle subscription events
-                    //     console.log( eventData.message );
-                    //     break;
-                    default:
-                        //default case
-                        console.log( eventData.message );
-                }
-            }
-        } );
-        socket.connect();
+
+        } )
+        socket.connect()
     }
 }
 
