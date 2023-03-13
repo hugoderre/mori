@@ -3,14 +3,40 @@ const util = require( 'util' )
 const { getDateISO } = require( './utils' )
 
 class CompletionLogger {
-    constructor() {
-        this.logFile = fs.createWriteStream( `./data/completion${ getDateISO() }.tsv`, { flags: 'w' } )
-        this.logFile.write( util.format( "prompt\tcompletion" ) + '\n' );
-    }
+	constructor() {
+		this.logFile = this.initLogFile()
+	}
 
-    writeCompletion( prompt, completion ) {
-        this.logFile.write( util.format( prompt + '\t' + completion ) + '\n' );
-    }
+	initLogFile() {
+		const logDir = './data';
+		const logFilePath = `${logDir}/completion${getDateISO()}.tsv`;
+
+		if ( !fs.existsSync( logDir ) ) {
+			fs.mkdirSync( logDir );
+		}
+
+		const logFile = fs.createWriteStream( logFilePath, { flags: 'a' } )
+
+		// Write log file header text if empty
+		logFile.on( 'open', () => {
+			fs.stat( logFilePath, ( err, stats ) => {
+				if ( err ) {
+					console.error( err );
+					return;
+				}
+				const fileSize = stats.size;
+				if ( fileSize === 0 ) {
+					logFile.write( util.format( 'prompt\tcompletion' ) + '\n' );
+				}
+			} );
+		} );
+
+		return logFile
+	}
+
+	writeCompletion( prompt, completion ) {
+		this.logFile.write( util.format( prompt + '\t' + completion ) + '\n' );
+	}
 }
 
 module.exports = CompletionLogger
