@@ -6,79 +6,87 @@ const { escapeSpecialChars } = require( './utils.js' )
 const dotenv = require( 'dotenv' )
 dotenv.config()
 
-class OpenAIClient{
-    constructor(expressApp) {
-        this.expressApp = expressApp
-        this.api = this.getApi()
-        this.completionLogger = new CompletionLogger()
-        this.voiceMakerAPI = new VoiceMakerAPI(this)
-        this.promptQueue = []
-        this.promptQueueIntervalRef = null
-        this.isCompletionInProcess = false
-        this.startPromptQueue()
-    }
+class OpenAIClient {
+	constructor( expressApp ) {
+		this.expressApp = expressApp
+		this.api = this.getApi()
+		this.completionLogger = new CompletionLogger()
+		this.voiceMakerAPI = new VoiceMakerAPI( this )
+		this.promptQueue = {
+			low: [],
+			medium: [],
+			high: []
+		}
+		this.promptQueueIntervalRef = null
+		this.isCompletionInProcess = false
+		this.startPromptQueue()
+	}
 
-    getApi() {
-        const configuration = new Configuration( {
-            apiKey: process.env.OPENAI_API_KEY,
-        } );
-        return new OpenAIApi( configuration );
-    }
+	getApi() {
+		const configuration = new Configuration( {
+			apiKey: process.env.OPENAI_API_KEY,
+		} );
+		return new OpenAIApi( configuration );
+	}
 
-    queueUpPrompt(prompt, priority) {
-        this.promptQueue.push(
-            {
-                prompt,
-                priority
-            }
-        )
-    }
+	queueUpPrompt( prompt, priority ) {
+		console.log( prompt, priority )
+		this.promptQueue[ priority ].push( prompt )
+	}
 
-    startPromptQueue() {
-        this.promptQueueIntervalRef = setInterval(async () => {
-            // console.log(this.promptQueue)
-            if(this.isCompletionInProcess || !this.promptQueue.length) {
-                return
-            }
+	startPromptQueue() {
+		this.promptQueueIntervalRef = setInterval( async () => {
+			if ( this.isCompletionInProcess ) {
+				return
+			}
+			const priorities = [ 'high', 'medium', 'low' ]
+			for ( const priority of priorities ) {
+				if ( !this.promptQueue[ priority ][ 0 ] ) {
+					continue
+				}
+				await this.runChatCompletion( this.promptQueue[ priority ].pop() )
+				break
+			}
+		}, 1000 );
+	}
 
-            const promptData = this.promptQueue.pop()
-            await this.runChatCompletion( promptData.prompt )
-        }, 1000);
-    }
+	async runChatCompletion( prompt ) {
+		this.isCompletionInProcess = true
+		const completionObj = await this.api.createChatCompletion( {
+			model: process.env.OPENAI_CHAT_MODEL,
+			messages: [
+				{ "role": 'system', "content": "Tu t'appelles Mori, une IA et streameuse sur Twitch, tu réponds aux question sur le tchat. Ta personnalité reflète ce que pourrait être une fille mignonne et rigolote dans un manga shonen, mais tu aimes bien aussi être sarcastique, ironique ou avoir du second degrés parfois lorsqu'on te pose des questions. Tes passions sont les mangas, les jeux-vidéos, la peinture et faire des émission en direct sur Twitch" },
+				{ "role": 'user', "content": prompt.text }
+			],
+			max_tokens: prompt.max_tokens ?? 100,
+			temperature: prompt.temperature,
+			user: prompt.username ? sha256( prompt.username ) : ''
+		} );
 
-    async runChatCompletion( prompt ) {
-        this.isCompletionInProcess = true
+		const completion = escapeSpecialChars( completionObj.data.choices[ 0 ].message.content )
+		this.completionLogger.writeCompletion( prompt, completion )
+		this.voiceMakerAPI.sayInProcess( completion )
 
-        const completionObj = await this.api.createChatCompletion( {
-            model: process.env.OPENAI_CHAT_MODEL,
-            messages: [
-                { "role": 'system', "content": "Tu t'appelles Mori, une IA et streameuse sur Twitch, tu réponds aux question sur le tchat. Ta personnalité reflète ce que pourrait être une fille mignonne et rigolote dans un manga shonen, mais tu aimes bien aussi être sarcastique, ironique ou avoir du second degrés parfois lorsqu'on te pose des questions. Tes passions sont les mangas, les jeux-vidéos, la peinture et faire des émission en direct sur Twitch" },
-                { "role": 'user', "content": prompt.text }
-            ],
-            max_tokens: 15,
-            temperature: prompt.temperature,
-            user: prompt.username ? sha256(  prompt.username ) : ''
-        } );
+		return completion
+	}
 
-        const completion = escapeSpecialChars( completionObj.data.choices[ 0 ].message.content )
-        this.completionLogger.writeCompletion( prompt, completion )
-        this.voiceMakerAPI.sayInProcess( completion )
+	listenCustomPrompt() {
+		this.expressApp.post( '/custom-prompt', async ( req, res ) => {
+			if ( !req.body.text ) {
+				return res.send( 'Wrong body format' )
+			}
 
-        return completion
-    }
-
-    listenCustomPrompt() {
-        this.expressApp.post( '/custom-prompt', async ( req, res ) => {
-            const text = req.body.text
-            const temperature = req.body.temperature
-            if(!text || !temperature) return
-            await this.runChatCompletion(
-                text,
-                temperature
-            )
-            return res.send('Custom prompt done')
-        } )
-    }
+			this.queueUpPrompt(
+				{
+					text: req.body.text,
+					temperature: req.body.temperature ?? 0.8,
+					max_tokens: req.body.max_tokens ?? 100
+				},
+				'high'
+			)
+			return res.send( 'Custom prompt done' )
+		} )
+	}
 }
 
 module.exports = OpenAIClient
