@@ -102,7 +102,7 @@ class TmiApiClient {
 	}
 
 	isValidChatMessage( username, message ) {
-		if ( message.length > 100 ) {
+		if ( !message || message.length > 100 ) {
 			return
 		}
 
