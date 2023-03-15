@@ -65,7 +65,7 @@ class OpenAIClient {
 
 		const completion = escapeSpecialChars( completionObj.data.choices[ 0 ].message.content )
 		this.completionLogger.writeCompletion( prompt, completion )
-		this.voiceMakerAPI.sayInProcess( completion )
+		this.voiceMakerAPI.runTTS( completion )
 
 		return completion
 	}
@@ -80,7 +80,7 @@ class OpenAIClient {
 				{
 					text: req.body.text,
 					temperature: req.body.temperature ?? 0.8,
-					max_tokens: req.body.max_tokens ?? 100
+					max_tokens: req.body.max_tokens ?? 110
 				},
 				'high'
 			)

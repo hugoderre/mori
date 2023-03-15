@@ -8,7 +8,7 @@ function getDateISO() {
 }
 
 function escapeSpecialChars( str ) {
-	const regex = new RegExp( /[A-Za-z0-9+-éèàùâûê%ç&*@ô)(\/\\=:?!'" ]/, 'gm' )
+	const regex = new RegExp( /[A-Za-z0-9+-éèàùâûêîïëöä%ç&*@ôŒœ)(\/\\=:?!'" ]/, 'gm' )
 	const strMatches = str.match( regex )
 
 	return strMatches ? strMatches.join( '' ) : ''

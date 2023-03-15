@@ -1,22 +1,22 @@
 const { spawn } = require( 'node:child_process' )
 const { VoiceMaker, VoiceMakerRequest } = require( 'voicemaker' )
-require( 'console.mute' )
 
 class VoiceMakerAPI {
 	constructor( openaiClientInstance ) {
 		this.openaiClientInstance = openaiClientInstance
-		this.engine = new VoiceMaker()
+		this.voiceMakerEngine = new VoiceMaker()
 	}
 
-	async sayInProcess( message ) {
-		const request = new VoiceMakerRequest( message )
-		request.setVoice( "ai3-fr-FR-Emmy" )
-		request.pitch = "8%"
-		request.volume = 10
-		console.mute()
-		await this.engine.say( request )
-		console.resume()
-		this.openaiClientInstance.isCompletionInProcess = false
+	async runTTS( message ) {
+		const voiceMakerRequest = new VoiceMakerRequest( message )
+		voiceMakerRequest.setVoice( "ai3-fr-FR-Emmy" )
+		voiceMakerRequest.pitch = "8%"
+		voiceMakerRequest.volume = 10
+		const outputPath = await this.voiceMakerEngine.getTts( voiceMakerRequest )
+		const vlcProcess = spawn( 'vlc', [ '--intf', 'dummy', '--no-video', '--play-and-exit', outputPath ] )
+		vlcProcess.on( 'close', ( code ) => {
+			this.openaiClientInstance.isCompletionInProcess = false
+		} )
 	}
 }
 

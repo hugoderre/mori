@@ -40,7 +40,6 @@ class StreamlabsApiClient {
 					)
 					break
 				default:
-					console.log( eventData.message )
 					break
 			}
 
