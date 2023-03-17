@@ -33,7 +33,7 @@ class TmiApiClient {
 
 		this.OpenAIClient.queueUpPrompt(
 			{
-				text: `En respectant les règles de Twitch, réponds de façon courte et à la première personne comme Mori (streameuse Twitch) répondrait ou réagirait au viewer "${username}" qui écrit cela dans le tchat: "${fMessage}"`,
+				text: `Mori, en respectant les règles de Twitch, réponds sans emoticone et répond parfois avec sarcasme ou second dégrés au viewer "${username}" qui écrit cela dans le tchat: "${fMessage}"`,
 				temperature: 0.8,
 				username: ''
 			},
@@ -102,7 +102,7 @@ class TmiApiClient {
 	}
 
 	isValidChatMessage( username, message ) {
-		if ( !message || message.length > 100 ) {
+		if ( !message || message.length > 300 ) {
 			return
 		}
 
