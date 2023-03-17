@@ -17,12 +17,15 @@ class StreamlabsApiClient {
 		} )
 
 		socket.on( 'event', async ( eventData ) => {
-
+			const type = eventData.type
 			switch ( eventData.type ) {
 				case 'follow':
 					await this.OpenAIClient.queueUpPrompt(
 						{
-							text: `Mori, le viewer "${eventData.message[ 0 ].name}" vient de follow ta chaine twitch ! Souhaite lui la bienvenue de façon concise.`,
+							type,
+							messages: [
+								{ "role": "user", "content": `Mori, le viewer "${eventData.message[ 0 ].name}" vient de follow ta chaine twitch ! Souhaite lui la bienvenue de façon concise.` }
+							],
 							temperature: 0.9,
 							username: ''
 						},
@@ -32,7 +35,10 @@ class StreamlabsApiClient {
 				case 'donation':
 					await this.OpenAIClient.queueUpPrompt(
 						{
-							text: `Mori, le viewer "${eventData.message[ 0 ].name}" vient de donner ${eventData.message[ 0 ].formatted_amount} à ta chaine Twitch ! Remercie le très chaleureuse.`,
+							type,
+							messages: [
+								{ "role": "user", "content": `Mori, le viewer "${eventData.message[ 0 ].name}" vient de donner ${eventData.message[ 0 ].formatted_amount} à ta chaine Twitch ! Remercie le très chaleureuse.` }
+							],
 							temperature: 0.8,
 							username: ''
 						},

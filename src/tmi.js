@@ -1,9 +1,13 @@
 const tmi = require( 'tmi.js' )
+const MessagesCollection = require( './mongo/messagesCollection.js' )
 const { escapeSpecialChars } = require( './utils.js' )
 
 class TmiApiClient {
-	constructor( OpenAIClient ) {
+	constructor( expressApp, OpenAIClient ) {
+		this.expressApp = expressApp
 		this.OpenAIClient = OpenAIClient
+		this.messagesCollection = new MessagesCollection()
+		this.messagesCollection.initClient()
 	}
 
 	startClient() {
@@ -31,19 +35,51 @@ class TmiApiClient {
 			return
 		}
 
+		const previousUserMessages = await this.messagesCollection.findMessagesByUsername( username ) ?? []
+
+		const formattedPreviousUserMessages =
+			previousUserMessages && previousUserMessages.messages ?
+				previousUserMessages.messages.map( ( msg ) => [
+					{ "role": "user", "content": msg.message },
+					{ "role": "assistant", "content": msg.response },
+				] ).flat()
+				: []
+
 		this.OpenAIClient.queueUpPrompt(
 			{
-				text: `Mori, en respectant les règles de Twitch, réponds sans emoticone et répond parfois avec sarcasme ou second dégrés au viewer "${username}" qui écrit cela dans le tchat: "${fMessage}"`,
+				type: 'chat_message',
+				messages: [
+					{ "role": 'user', "content": `Chaque message du viewer "${username}" qui va suivre vient de ton tchat Twitch, réponds lui directement de façon courte et parfois avec sarcasme ou second dégrés, et sans smiley.` },
+					{ "role": "assistant", "content": "Très bien, c'est parti !" },
+					...formattedPreviousUserMessages,
+					{ "role": 'user', "content": fMessage }
+				],
 				temperature: 0.8,
-				username: ''
+				username
 			},
 			'low'
 		)
+
+		this.expressApp.once( 'completion_completed', async ( data ) => {
+			const newMessage = {
+				timestamp,
+				message: fMessage,
+				response: data.completion,
+			}
+			await this.messagesCollection.pushViewerMessageUpsert(
+				username,
+				newMessage,
+				7
+			)
+		} )
 	}
 
 	async subCallback( channel, username, methods, msg, tags ) {
 		this.OpenAIClient.queueUpPrompt( {
-			text: `Mori, le viewer "${username}" vient de s'abonner à ta chaine Twitch pour la première fois. Remerçie le chaleureusement et de façon conçise.`,
+			type: 'sub',
+			messages: [
+				{ "role": 'user', "content": `Mori, le viewer "${username}" vient de s'abonner à ta chaine Twitch pour la première fois. Remerçie le chaleureusement et de façon conçise.` }
+			],
 			temperature: 0.5,
 			username: username
 		},
@@ -53,7 +89,10 @@ class TmiApiClient {
 
 	async cheerCallback( channel, tags, message ) {
 		this.OpenAIClient.queueUpPrompt( {
-			text: `Mori, le viewer "${tags.username}" vient d'offrir ${tags.bits} bits à ta chaine Twitch. Remerçie le chaleureusement et de façon conçise.`,
+			type: 'cheer',
+			messages: [
+				{ "role": 'user', "content": `Mori, le viewer "${tags.username}" vient d'offrir ${tags.bits} bits à ta chaine Twitch. Remerçie le chaleureusement et de façon conçise.` }
+			],
 			temperature: 0.5,
 			username: tags.username
 		},
@@ -63,7 +102,10 @@ class TmiApiClient {
 
 	async resubCallback( channel, username, streakMonths, msg, tags, methods ) {
 		this.OpenAIClient.queueUpPrompt( {
-			text: `Mori, le viewer "${username}" vient de se réabonner à ta chaine Twitch. C'est son ${tags[ 'badge-info' ].subscriber}ème mois d'abonnement. Remerçie le chaleureusement et de façon conçise.`,
+			type: 'resub',
+			messages: [
+				{ "role": 'user', "content": `Mori, le viewer "${username}" vient de se réabonner à ta chaine Twitch. C'est son ${tags[ 'badge-info' ].subscriber}ème mois d'abonnement. Remerçie le chaleureusement et de façon conçise.` }
+			],
 			temperature: 0.5,
 			username: username
 		},
@@ -73,7 +115,10 @@ class TmiApiClient {
 
 	async subgiftCallback( channel, username, streakMonths, recipient, methods, tags ) {
 		this.OpenAIClient.queueUpPrompt( {
-			text: `Mori, le viewer "${username}" vient d'offrir un abonnement cadeau à ${recipient} à ta chaine Twitch. Remerçie ${username} chaleureusement et de façon conçise.`,
+			type: 'subgift',
+			messages: [
+				{ "role": 'user', "content": `Mori, le viewer "${username}" vient d'offrir un abonnement cadeau à ${recipient} à ta chaine Twitch. Remerçie ${username} chaleureusement et de façon conçise.` }
+			],
 			temperature: 0.5,
 			username: username
 		},
@@ -83,7 +128,10 @@ class TmiApiClient {
 
 	async anonsubgiftCallback( channel, streakMonths, recipient, methods, tags ) {
 		this.OpenAIClient.queueUpPrompt( {
-			text: `Mori, un viewer anonyme vient d'offrir un abonnement cadeau à ${recipient} à ta chaine Twitch. Remerçie ce viewer anonyme chaleureusement et de façon conçise.`,
+			type: 'anonsubgift',
+			messages: [
+				{ "role": 'user', "content": `Mori, un viewer anonyme vient d'offrir un abonnement cadeau à ${recipient} à ta chaine Twitch. Remerçie ce viewer anonyme chaleureusement et de façon conçise.` }
+			],
 			temperature: 0.5,
 			username: ''
 		},
@@ -93,7 +141,10 @@ class TmiApiClient {
 
 	async raidCallback( channel, username, viewers, tags ) {
 		this.OpenAIClient.queueUpPrompt( {
-			text: `Mori, tu viens de recevoir un raid sur ta chaine Twitch de la part de ${username}, remerçie le et souhaite la bienvenue aux ${viewers} viewers !`,
+			type: 'raid',
+			messages: [
+				{ "role": 'user', "content": `Mori, tu viens de recevoir un raid sur ta chaine Twitch de la part de ${username}, remerçie le et souhaite la bienvenue aux ${viewers} viewers !` }
+			],
 			temperature: 0.5,
 			username: username
 		},

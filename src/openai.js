@@ -10,8 +10,8 @@ class OpenAIClient {
 	constructor( expressApp ) {
 		this.expressApp = expressApp
 		this.api = this.getApi()
-		this.completionLogger = new CompletionLogger()
 		this.voiceMakerAPI = new VoiceMakerAPI( this )
+		this.completionLogger = new CompletionLogger()
 		this.promptQueue = {
 			low: [],
 			medium: [],
@@ -52,21 +52,28 @@ class OpenAIClient {
 
 	async runChatCompletion( prompt ) {
 		this.isCompletionInProcess = true
+
 		const completionObj = await this.api.createChatCompletion( {
 			model: process.env.OPENAI_CHAT_MODEL,
 			messages: [
-				{ "role": 'system', "content": "Tu t'appelles Mori, une IA et streameuse sur Twitch, tu réponds aux question sur le tchat. Ta personnalité reflète ce que pourrait être une fille mignonne et rigolote dans un manga shonen, mais tu aimes bien aussi être sarcastique, ironique ou avoir du second degrés parfois lorsqu'on te pose des questions. Tes passions sont les mangas, les jeux-vidéos, la peinture et faire des émission en direct sur Twitch. N'utilise pas de smiley." },
-				{ "role": 'user', "content": prompt.text }
+				{
+					"role": 'system',
+					"content": "Tu t'appelles Mori, une IA et streameuse sur Twitch, tu réponds aux question sur le tchat. Ta personnalité reflète ce que pourrait être une fille mignonne et rigolote dans un manga shonen, mais tu aimes bien aussi être sarcastique, ironique ou avoir du second degrés parfois lorsqu'on te pose des questions. Tes passions sont les mangas, les jeux-vidéos, la peinture et faire des émission en direct sur Twitch."
+				},
+				...prompt.messages
 			],
 			max_tokens: prompt.max_tokens ?? 120,
 			temperature: prompt.temperature,
 			user: prompt.username ? sha256( prompt.username ) : ''
 		} );
 
-		let completion = escapeSpecialChars( completionObj.data.choices[ 0 ].message.content )
-		completion = this.completionPostFormatting( completion )
-		this.completionLogger.writeCompletion( prompt, completion )
+		let completion = this.completionPostFormatting( escapeSpecialChars( completionObj.data.choices[ 0 ].message.content ) )
+		this.completionLogger.writeCompletion( prompt.messages[ prompt.messages.length - 1 ].content, completion )
 		this.voiceMakerAPI.runTTS( completion )
+
+		this.expressApp.emit( 'completion_completed', {
+			"completion": completion
+		} )
 
 		return completion
 	}
@@ -79,15 +86,16 @@ class OpenAIClient {
 
 	listenCustomPrompt() {
 		this.expressApp.post( '/custom-prompt', async ( req, res ) => {
-			if ( !req.body.text ) {
+			if ( !req.body.messages ) {
 				return res.send( 'Wrong body format' )
 			}
 
 			this.queueUpPrompt(
 				{
-					text: `Mori, en respectant les règles de Twitch, réponds de façon courte, sans emoticone et si le message du viewer est une question, commence ta phrase en reprenant sa question et répond parfois avec sarcasme ou second dégrés à un viewer qui écrit cela dans le tchat: "${req.body.text}"`,
+					messages: req.body.messages,
 					temperature: req.body.temperature ?? 0.8,
-					max_tokens: req.body.max_tokens ?? 200
+					max_tokens: req.body.max_tokens ?? 200,
+					username: req.body.username ?? ''
 				},
 				'high'
 			)
