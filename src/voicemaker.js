@@ -8,6 +8,10 @@ class VoiceMakerAPI {
 	}
 
 	async runTTS( message ) {
+		if ( !message ) {
+			this.openaiClientInstance.isCompletionInProcess = false
+			return
+		}
 		const voiceMakerRequest = new VoiceMakerRequest( message )
 		voiceMakerRequest.setVoice( "ai3-fr-FR-Emmy" )
 		voiceMakerRequest.pitch = "8%"
@@ -16,6 +20,7 @@ class VoiceMakerAPI {
 		const vlcProcess = spawn( 'vlc', [ '--intf', 'dummy', '--no-video', '--play-and-exit', outputPath ] )
 		vlcProcess.on( 'close', ( code ) => {
 			this.openaiClientInstance.isCompletionInProcess = false
+			console.log( 'TTS DONE' )
 		} )
 	}
 }
