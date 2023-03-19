@@ -53,23 +53,17 @@ class OpenAIClient {
 
 	async runChatCompletion( prompt ) {
 		this.isCompletionInProcess = true
-
-		const completionObj = await this.api.createChatCompletion( {
-			model: process.env.OPENAI_CHAT_MODEL,
-			messages: [
-				{
-					"role": 'system',
-					"content": "Tu t'appelles Mori, une streameuse sur Twitch avec du second degrés, sarcastique, ironique et attachante. Tu réponds aux question sur le tchat."
-				},
-				...prompt.messages
-			],
-			max_tokens: prompt.max_tokens ?? 150,
-			temperature: prompt.temperature,
-			user: prompt.username ? sha256( prompt.username ) : ''
-		} );
+		let completionObj
+		try {
+			completionObj = await this.createChatCompletionWithRetryAndTimeout( prompt, 4, 1000, 10000 );
+		} catch ( error ) {
+			this.isCompletionInProcess = true
+			console.error( "Erreur lors de la création de la completion:", error );
+			return
+		}
 
 		let completion = this.completionPostFormatting( escapeSpecialChars( completionObj.data.choices[ 0 ].message.content ) )
-		console.log( completion )
+		console.log( 'received: ', completion )
 		this.completionLogger.writeCompletion( prompt.messages[ prompt.messages.length - 1 ].content, completion )
 		this.voiceMakerAPI.runTTS( completion )
 
@@ -78,6 +72,56 @@ class OpenAIClient {
 		} )
 
 		return completion
+	}
+
+	async createChatCompletionWithRetryAndTimeout( prompt, maxRetries, retryDelay, timeout ) {
+		for ( let attempt = 1; attempt <= maxRetries; attempt++ ) {
+			try {
+				let isRequestCompleted = false;
+				let completionObj;
+
+				const completionPromise = this.api.createChatCompletion( {
+					model: process.env.OPENAI_CHAT_MODEL,
+					messages: [
+						{
+							role: 'system',
+							content:
+								"Tu t'appelles Mori, une streameuse sur Twitch avec du second degrés, sarcastique, ironique et attachante. Tu réponds aux question sur le tchat.",
+						},
+						...prompt.messages,
+					],
+					max_tokens: prompt.max_tokens ?? 150,
+					temperature: prompt.temperature,
+					user: prompt.username ? sha256( prompt.username ) : '',
+				} );
+
+				completionPromise.then( ( result ) => {
+					isRequestCompleted = true;
+					completionObj = result;
+				} );
+
+				await new Promise( ( resolve ) => setTimeout( resolve, timeout ) );
+
+				if ( isRequestCompleted ) {
+					return completionObj;
+				} else {
+					console.log( `La tentative ${attempt} a échoué en raison du délai d'attente dépassé.` );
+					// Attendez avant de réessayer.
+					await new Promise( ( resolve ) => setTimeout( resolve, retryDelay ) );
+				}
+			} catch ( error ) {
+				console.error( `Erreur lors de la tentative ${attempt}:`, error );
+
+				if ( attempt === maxRetries ) {
+					throw new Error( "Nombre maximal de tentatives atteint. Échec de la requête." );
+				}
+
+				// Attendez avant de réessayer.
+				await new Promise( ( resolve ) => setTimeout( resolve, retryDelay ) );
+			}
+		}
+
+		throw new Error( "Nombre maximal de tentatives atteint. Échec de la requête." );
 	}
 
 	completionPostFormatting( completion ) {
@@ -131,7 +175,6 @@ class OpenAIClient {
 						...req.body.messages
 					],
 					temperature: 0.8,
-					top_p: 0.8,
 					max_tokens: 100,
 					username: req.body.username
 				},
