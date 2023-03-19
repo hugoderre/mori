@@ -1,13 +1,11 @@
 const tmi = require( 'tmi.js' )
-const MessagesCollection = require( './mongo/messagesCollection.js' )
 const { escapeSpecialChars } = require( './utils.js' )
 
 class TmiApiClient {
-	constructor( expressApp, OpenAIClient ) {
+	constructor( expressApp, openAIClient, messagesCollection ) {
 		this.expressApp = expressApp
-		this.OpenAIClient = OpenAIClient
-		this.messagesCollection = new MessagesCollection()
-		this.messagesCollection.initClient()
+		this.openAIClient = openAIClient
+		this.messagesCollection = messagesCollection
 	}
 
 	startClient() {
@@ -45,16 +43,16 @@ class TmiApiClient {
 				] ).flat()
 				: []
 
-		this.OpenAIClient.queueUpPrompt(
+		this.openAIClient.queueUpPrompt(
 			{
 				type: 'chat_message',
 				messages: [
-					{ "role": 'user', "content": `Chaque message du viewer "${username}" qui va suivre vient de ton tchat Twitch, réponds lui directement de façon courte et parfois avec sarcasme ou second dégrés, et sans smiley.` },
-					{ "role": "assistant", "content": "Très bien, c'est parti !" },
+					{ "role": 'user', "content": `Mori, les prochains messages sont une conversations avec le viewer "${req.body.username}". Pour tous les messages, réponds soit de façon sarcastique, ironique ou avec second degrés, soit de façon plus sympatique. Tu aimes les mangas, les jeux-vidéos, la peinture et faire des émission en direct sur Twitch. Garde TOUJOURS cette personnalité en tête.` },
 					...formattedPreviousUserMessages,
 					{ "role": 'user', "content": fMessage }
 				],
 				temperature: 0.8,
+				top_p: 0.8,
 				username
 			},
 			'low'
@@ -69,13 +67,13 @@ class TmiApiClient {
 			await this.messagesCollection.pushViewerMessageUpsert(
 				username,
 				newMessage,
-				7
+				4
 			)
 		} )
 	}
 
 	async subCallback( channel, username, methods, msg, tags ) {
-		this.OpenAIClient.queueUpPrompt( {
+		this.openAIClient.queueUpPrompt( {
 			type: 'sub',
 			messages: [
 				{ "role": 'user', "content": `Mori, le viewer "${username}" vient de s'abonner à ta chaine Twitch pour la première fois. Remerçie le chaleureusement et de façon conçise.` }
@@ -88,7 +86,7 @@ class TmiApiClient {
 	}
 
 	async cheerCallback( channel, tags, message ) {
-		this.OpenAIClient.queueUpPrompt( {
+		this.openAIClient.queueUpPrompt( {
 			type: 'cheer',
 			messages: [
 				{ "role": 'user', "content": `Mori, le viewer "${tags.username}" vient d'offrir ${tags.bits} bits à ta chaine Twitch. Remerçie le chaleureusement et de façon conçise.` }
@@ -101,7 +99,7 @@ class TmiApiClient {
 	}
 
 	async resubCallback( channel, username, streakMonths, msg, tags, methods ) {
-		this.OpenAIClient.queueUpPrompt( {
+		this.openAIClient.queueUpPrompt( {
 			type: 'resub',
 			messages: [
 				{ "role": 'user', "content": `Mori, le viewer "${username}" vient de se réabonner à ta chaine Twitch. C'est son ${tags[ 'badge-info' ].subscriber}ème mois d'abonnement. Remerçie le chaleureusement et de façon conçise.` }
@@ -114,7 +112,7 @@ class TmiApiClient {
 	}
 
 	async subgiftCallback( channel, username, streakMonths, recipient, methods, tags ) {
-		this.OpenAIClient.queueUpPrompt( {
+		this.openAIClient.queueUpPrompt( {
 			type: 'subgift',
 			messages: [
 				{ "role": 'user', "content": `Mori, le viewer "${username}" vient d'offrir un abonnement cadeau à ${recipient} à ta chaine Twitch. Remerçie ${username} chaleureusement et de façon conçise.` }
@@ -127,7 +125,7 @@ class TmiApiClient {
 	}
 
 	async anonsubgiftCallback( channel, streakMonths, recipient, methods, tags ) {
-		this.OpenAIClient.queueUpPrompt( {
+		this.openAIClient.queueUpPrompt( {
 			type: 'anonsubgift',
 			messages: [
 				{ "role": 'user', "content": `Mori, un viewer anonyme vient d'offrir un abonnement cadeau à ${recipient} à ta chaine Twitch. Remerçie ce viewer anonyme chaleureusement et de façon conçise.` }
@@ -140,7 +138,7 @@ class TmiApiClient {
 	}
 
 	async raidCallback( channel, username, viewers, tags ) {
-		this.OpenAIClient.queueUpPrompt( {
+		this.openAIClient.queueUpPrompt( {
 			type: 'raid',
 			messages: [
 				{ "role": 'user', "content": `Mori, tu viens de recevoir un raid sur ta chaine Twitch de la part de ${username}, remerçie le et souhaite la bienvenue aux ${viewers} viewers !` }

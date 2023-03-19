@@ -7,8 +7,9 @@ const dotenv = require( 'dotenv' )
 dotenv.config()
 
 class OpenAIClient {
-	constructor( expressApp ) {
+	constructor( expressApp, messagesCollection ) {
 		this.expressApp = expressApp
+		this.messagesCollection = messagesCollection
 		this.api = this.getApi()
 		this.voiceMakerAPI = new VoiceMakerAPI( this )
 		this.completionLogger = new CompletionLogger()
@@ -58,16 +59,17 @@ class OpenAIClient {
 			messages: [
 				{
 					"role": 'system',
-					"content": "Tu t'appelles Mori, une IA et streameuse sur Twitch, tu réponds aux question sur le tchat. Ta personnalité reflète ce que pourrait être une fille mignonne et rigolote dans un manga shonen, mais tu aimes bien aussi être sarcastique, ironique ou avoir du second degrés parfois lorsqu'on te pose des questions. Tes passions sont les mangas, les jeux-vidéos, la peinture et faire des émission en direct sur Twitch."
+					"content": "Tu t'appelles Mori, une streameuse sur Twitch avec du second degrés, sarcastique, ironique et attachante. Tu réponds aux question sur le tchat."
 				},
 				...prompt.messages
 			],
-			max_tokens: prompt.max_tokens ?? 120,
+			max_tokens: prompt.max_tokens ?? 150,
 			temperature: prompt.temperature,
 			user: prompt.username ? sha256( prompt.username ) : ''
 		} );
 
 		let completion = this.completionPostFormatting( escapeSpecialChars( completionObj.data.choices[ 0 ].message.content ) )
+		console.log( completion )
 		this.completionLogger.writeCompletion( prompt.messages[ prompt.messages.length - 1 ].content, completion )
 		this.voiceMakerAPI.runTTS( completion )
 
@@ -81,6 +83,7 @@ class OpenAIClient {
 	completionPostFormatting( completion ) {
 		let fCompletion = completion.replace( 'Mori:', '' )
 			.replace( 'Mori :', '' )
+			.replace( ';)', '' )
 		return fCompletion
 	}
 
@@ -99,6 +102,57 @@ class OpenAIClient {
 				},
 				'high'
 			)
+
+			return res.send( 'Custom prompt done' )
+		} )
+	}
+
+	listenTestPrompt() {
+		this.expressApp.post( '/test-prompt', async ( req, res ) => {
+			if ( !req.body.messages || !req.body.username ) {
+				return res.send( 'Wrong body format' )
+			}
+
+			const previousUserMessages = await this.messagesCollection.findMessagesByUsername( req.body.username ) ?? []
+
+			const formattedPreviousUserMessages =
+				previousUserMessages && previousUserMessages.messages ?
+					previousUserMessages.messages.map( ( msg ) => [
+						{ "role": "user", "content": msg.message },
+						{ "role": "assistant", "content": msg.response },
+					] ).flat()
+					: []
+
+			this.queueUpPrompt(
+				{
+					messages: [
+						{ "role": 'user', "content": `Mori, les prochains messages sont une conversations avec le viewer "${req.body.username}". Pour tous les messages, réponds soit de façon sarcastique, ironique ou avec second degrés, soit de façon plus sympatique. Tu aimes les mangas, les jeux-vidéos, la peinture et faire des émission en direct sur Twitch. Garde TOUJOURS cette personnalité en tête.` },
+						...formattedPreviousUserMessages,
+						...req.body.messages
+					],
+					temperature: 0.8,
+					top_p: 0.8,
+					max_tokens: 100,
+					username: req.body.username
+				},
+				'high'
+			)
+
+			this.expressApp.once( 'completion_completed', async ( data ) => {
+				console.log( 'Send to DB' )
+				const newMessage = {
+					timestamp: Date.now(),
+					message: req.body.messages[ 0 ].content,
+					response: data.completion,
+				}
+				await this.messagesCollection.pushViewerMessageUpsert(
+					req.body.username,
+					newMessage,
+					4
+				)
+			} )
+
+
 			return res.send( 'Custom prompt done' )
 		} )
 	}
