@@ -57,7 +57,7 @@ class OpenAIClient {
 		try {
 			completionObj = await this.createChatCompletionWithRetryAndTimeout( prompt, 4, 1000, 10000 );
 		} catch ( error ) {
-			this.isCompletionInProcess = true
+			this.isCompletionInProcess = false
 			console.error( "Erreur lors de la création de la completion:", error );
 			return
 		}
@@ -106,7 +106,6 @@ class OpenAIClient {
 					return completionObj;
 				} else {
 					console.log( `La tentative ${attempt} a échoué en raison du délai d'attente dépassé.` );
-					// Attendez avant de réessayer.
 					await new Promise( ( resolve ) => setTimeout( resolve, retryDelay ) );
 				}
 			} catch ( error ) {
