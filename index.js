@@ -6,4 +6,5 @@ const App = require( './src/app.js' )
 expressApp.listen( 3000, () => console.log( 'Listen 3000' ) )
 expressApp.use( bodyParser.json() );
 
-new App( expressApp )
+const app = new App( expressApp )
+app.init()
