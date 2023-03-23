@@ -10,8 +10,7 @@ class VoiceMakerAPI {
 
 	async runTTS( message ) {
 		if ( !message ) {
-			this.openaiClientInstance.isCompletionInProcess = false
-			return
+			throw new Error( 'No message provided.' )
 		}
 		const voiceMakerRequest = new VoiceMakerRequest( message )
 		voiceMakerRequest.setVoice( "ai3-fr-FR-Emmy" )
@@ -51,7 +50,7 @@ class VoiceMakerAPI {
 				wordIndex++
 			} else {
 				clearInterval( interval )
-				setTimeout( () => fs.writeFileSync( filePath, '', 'utf8' ), 4500 )
+				setTimeout( () => fs.writeFileSync( filePath, '', 'utf8' ), 7000 )
 			}
 		}, 200 )
 	}
