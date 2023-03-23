@@ -56,7 +56,7 @@ class OpenAIClient {
 		let completionObj
 
 		try {
-			completionObj = await this.createChatCompletionWithRetryAndTimeout( prompt, 2, 1000, 10000 );
+			completionObj = await this.createChatCompletionWithRetryAndTimeout( prompt, 3, 1000, 11000 );
 		} catch ( error ) {
 			this.isCompletionInProcess = false
 			console.error( "Erreur lors de la création de la completion :", error );
@@ -92,8 +92,6 @@ class OpenAIClient {
 	async createChatCompletionWithRetryAndTimeout( prompt, maxRetries, retryDelay, timeout ) {
 		for ( let attempt = 1; attempt <= maxRetries; attempt++ ) {
 			try {
-				let completionObj;
-
 				const completionPromise = this.api.createChatCompletion( {
 					model: process.env.OPENAI_CHAT_MODEL,
 					messages: [
@@ -111,9 +109,12 @@ class OpenAIClient {
 					user: prompt.username ? sha256( prompt.username ) : '',
 				} );
 
-				completionObj = await completionPromise;
-				return completionObj;
+				const completionObj = await Promise.race( [
+					completionPromise,
+					new Promise( ( _, reject ) => setTimeout( () => reject( new Error( 'Timeout Completion' ) ), timeout ) ),
+				] );
 
+				return completionObj;
 			} catch ( error ) {
 				console.error( `Erreur lors de la tentative ${attempt}:`, error );
 
