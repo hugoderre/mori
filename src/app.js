@@ -1,7 +1,8 @@
 const MessagesCollection = require( './mongo/messagesCollection.js' )
 const OpenAIClient = require( './openai.js' )
-const StreamlabsApiClient = require( './streamlabs.js' )
-const TmiApiClient = require( './tmi.js' )
+const TwitchEventSub = require( './twitch/eventSub.js' )
+const StreamlabsApiClient = require( './twitch/streamlabs.js' )
+const TmiApiClient = require( './twitch/tmi.js' )
 const VtsPlugin = require( './vts.js' )
 
 class App {
@@ -10,7 +11,9 @@ class App {
 	}
 
 	async init() {
-		const vtsPlugin = new VtsPlugin
+		const twitchEventSub = new TwitchEventSub()
+
+		const vtsPlugin = new VtsPlugin( twitchEventSub )
 		await vtsPlugin.init()
 
 		const messagesCollection = new MessagesCollection()

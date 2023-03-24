@@ -1,5 +1,5 @@
 const tmi = require( 'tmi.js' )
-const { escapeSpecialChars } = require( './utils.js' )
+const { escapeSpecialChars } = require( './../utils.js' )
 
 class TmiApiClient {
 	constructor( expressApp, openAIClient, messagesCollection ) {
@@ -71,7 +71,7 @@ class TmiApiClient {
 		} )
 	}
 
-	async subCallback( channel, username, methods, msg, tags ) {
+	subCallback( channel, username, methods, msg, tags ) {
 		this.openAIClient.queueUpPrompt( {
 			type: 'sub',
 			messages: [
@@ -84,7 +84,7 @@ class TmiApiClient {
 		)
 	}
 
-	async cheerCallback( channel, tags, message ) {
+	cheerCallback( channel, tags, message ) {
 		this.openAIClient.queueUpPrompt( {
 			type: 'cheer',
 			messages: [
@@ -97,7 +97,7 @@ class TmiApiClient {
 		)
 	}
 
-	async resubCallback( channel, username, streakMonths, msg, tags, methods ) {
+	resubCallback( channel, username, streakMonths, msg, tags, methods ) {
 		this.openAIClient.queueUpPrompt( {
 			type: 'resub',
 			messages: [
@@ -110,7 +110,7 @@ class TmiApiClient {
 		)
 	}
 
-	async subgiftCallback( channel, username, streakMonths, recipient, methods, tags ) {
+	subgiftCallback( channel, username, streakMonths, recipient, methods, tags ) {
 		this.openAIClient.queueUpPrompt( {
 			type: 'subgift',
 			messages: [
@@ -123,7 +123,7 @@ class TmiApiClient {
 		)
 	}
 
-	async anonsubgiftCallback( channel, streakMonths, recipient, methods, tags ) {
+	anonsubgiftCallback( channel, streakMonths, recipient, methods, tags ) {
 		this.openAIClient.queueUpPrompt( {
 			type: 'anonsubgift',
 			messages: [
@@ -136,7 +136,7 @@ class TmiApiClient {
 		)
 	}
 
-	async raidCallback( channel, username, viewers, tags ) {
+	raidCallback( channel, username, viewers, tags ) {
 		this.openAIClient.queueUpPrompt( {
 			type: 'raid',
 			messages: [
@@ -149,12 +149,17 @@ class TmiApiClient {
 		)
 	}
 
+	redeemCallback( channel, username, rewardtype, tags, msg ) {
+		console.log( 'pass' )
+		console.log( channel, username, rewardtype, tags, msg )
+	}
+
 	isValidChatMessage( username, message ) {
 		if ( !message || message.length > 300 ) {
 			return
 		}
 
-		const usernameDenies = [ 'Moobot', 'WizeBot', 'Mori_IA' ]
+		const usernameDenies = [ 'Moobot', 'WizeBot', ]
 
 		if ( usernameDenies.some( u => username.includes( u ) ) ) {
 			return

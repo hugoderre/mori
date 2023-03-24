@@ -18,6 +18,11 @@
   },
   "homepage": "https://github.com/hugoderre/mori#readme",
   "dependencies": {
+    "@twurple/api": "^6.0.9",
+    "@twurple/eventsub-http": "^6.0.9",
+    "@twurple/eventsub-ngrok": "^6.0.9",
+    "@twurple/eventsub-ws": "^6.0.9",
+    "@twurple/pubsub": "^6.0.9",
     "base64-js": "^1.5.1",
     "body-parser": "^1.20.2",
     "child_process": "^1.0.2",
