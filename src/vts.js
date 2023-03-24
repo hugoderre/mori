@@ -3,11 +3,10 @@ const dotenv = require( 'dotenv' )
 dotenv.config()
 
 class VtsPlugin {
-	constructor( twitchEventSub ) {
+	constructor() {
 		this.socket = null
 		this.authToken = process.env.VTS_PLUGIN_AUTH_TOKEN ?? null
 		this.hotkeyList = null
-		this.twitchEventSub = twitchEventSub
 	}
 
 	async init() {
@@ -31,7 +30,6 @@ class VtsPlugin {
 						if ( message.data.authenticated ) {
 							console.log( 'Authentification au plugin VTS réussie' )
 							this.requestHotkeysList()
-							this.channelPointsRedemptionEventHandler()
 						} else {
 							this.pluginAuthenticationTokenRequest()
 						}
@@ -114,7 +112,7 @@ class VtsPlugin {
 	triggerHotkey( name ) {
 		const hotkey = this.hotkeyList.filter( h => h.name === name )
 
-		if ( !hotkey ) {
+		if ( !hotkey.length ) {
 			console.log( 'No hotkey found' )
 			return
 		}
@@ -130,19 +128,6 @@ class VtsPlugin {
 		}
 
 		this.socket.send( JSON.stringify( request ) )
-	}
-
-	channelPointsRedemptionEventHandler() {
-		const rewardsIdName = {
-			[ process.env.REWARD_ID_DRINK ]: 'Drink',
-			[ process.env.REWARD_ID_PET ]: 'Pet the Mori',
-		}
-		this.twitchEventSub.onRedemption( ( data ) => {
-			const hotkeyName = rewardsIdName[ data.rewardId ]
-			if ( hotkeyName ) {
-				this.triggerHotkey( hotkeyName )
-			}
-		} )
 	}
 }
 

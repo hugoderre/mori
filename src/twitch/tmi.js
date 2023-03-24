@@ -8,7 +8,7 @@ class TmiApiClient {
 		this.messagesCollection = messagesCollection
 	}
 
-	startClient() {
+	startListeners() {
 		const client = new tmi.Client( {
 			channels: [ 'mori_ia' ]
 		} );

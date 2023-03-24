@@ -4,7 +4,8 @@ const fs = require( 'fs' ).promises
 require( 'dotenv' ).config()
 
 class TwitchEventSub {
-	constructor() {
+	constructor( openAiClient ) {
+		this.openAiClient = openAiClient
 		this.clientId = process.env.TWITCH_CLIENT_ID
 		this.clientSecret = process.env.TWITCH_CLIENT_SECRET
 		this.userId = process.env.TWITCH_USER_ID
@@ -27,9 +28,64 @@ class TwitchEventSub {
 		return new PubSubClient( { authProvider } );
 	}
 
-	async onRedemption( callback ) {
+	startListeners() {
+		this.queueUpOnRedemption()
+	}
+
+	async queueUpOnRedemption() {
 		( await this.pubSubClient ).onRedemption( this.userId, ( data ) => {
-			callback( data )
+			switch ( data.rewardId ) {
+				case process.env.REWARD_ID_DRINK:
+					this.openAiClient.queueUpPrompt( {
+						type: 'vtsItemTrigger',
+						vtsHotkeyName: 'Drink',
+						messages: [
+							{ "role": 'user', "content": `Mori, le viewer "${data.userDisplayName}" vient de te donner une boisson pour te deshydrater. Remerçie le de façon sarcastique.` }
+						],
+						temperature: 0.9
+					},
+						'high'
+					)
+					break
+				case process.env.REWARD_ID_PET:
+					this.openAiClient.queueUpPrompt( {
+						type: 'vtsItemTrigger',
+						vtsHotkeyName: 'Pet the Mori',
+						messages: [
+							{ "role": 'user', "content": `Mori, le viewer "${data.userDisplayName}" vient de te caresser la tête virtuellement. Remerçie le de façon amusée et sarcastique.` }
+						],
+						temperature: 0.9
+					},
+						'high'
+					)
+					break
+				case process.env.REWARD_ID_SUNGLASSES:
+					this.openAiClient.queueUpPrompt( {
+						type: 'vtsItemTrigger',
+						vtsHotkeyName: 'Sunglasses',
+						messages: [
+							{ "role": 'user', "content": `Mori, le viewer "${data.userDisplayName}" vient de te mettre des lunettes de soleil. Remerçie le de façon amusée et sarcastique.` }
+						],
+						temperature: 0.9
+					},
+						'high'
+					)
+					break
+				case process.env.REWARD_ID_HAMMER:
+					this.openAiClient.queueUpPrompt( {
+						type: 'vtsItemTrigger',
+						vtsHotkeyName: 'Hammer',
+						messages: [
+							{ "role": 'user', "content": `Mori, le viewer "${data.userDisplayName}" vient de te mettre un coup de marteau virtuel. Réagis à ça de façon amusée et sarcastique.` }
+						],
+						temperature: 0.9
+					},
+						'high'
+					)
+					break
+				default:
+					break
+			}
 		} )
 	}
 }

@@ -7,9 +7,10 @@ const dotenv = require( 'dotenv' )
 dotenv.config()
 
 class OpenAIClient {
-	constructor( expressApp, messagesCollection ) {
+	constructor( expressApp, messagesCollection, vtsPlugin ) {
 		this.expressApp = expressApp
 		this.messagesCollection = messagesCollection
+		this.vtsPlugin = vtsPlugin
 		this.api = this.getApi()
 		this.voiceMakerAPI = new VoiceMakerAPI( this )
 		this.completionLogger = new CompletionLogger()
@@ -20,7 +21,7 @@ class OpenAIClient {
 		}
 		this.promptQueueIntervalRef = null
 		this.isCompletionInProcess = false
-		this.startPromptQueue()
+		this.initPromptQueue()
 	}
 
 	getApi() {
@@ -35,7 +36,7 @@ class OpenAIClient {
 		this.promptQueue[ priority ].push( prompt )
 	}
 
-	startPromptQueue() {
+	initPromptQueue() {
 		this.promptQueueIntervalRef = setInterval( async () => {
 			if ( this.isCompletionInProcess ) {
 				return
@@ -55,12 +56,17 @@ class OpenAIClient {
 		this.isCompletionInProcess = true
 		let completionObj
 
+		this.vtsPlugin.triggerHotkey( "Look Chat" )
 		try {
 			completionObj = await this.createChatCompletionWithRetryAndTimeout( prompt, 3, 1000, 11000 );
 		} catch ( error ) {
 			this.isCompletionInProcess = false
 			console.error( "Erreur lors de la création de la completion :", error );
 			return
+		}
+
+		if ( prompt.type === 'vtsItemTrigger' ) {
+			this.vtsPlugin.triggerHotkey( prompt.vtsHotkeyName )
 		}
 
 		let completion;
@@ -75,6 +81,8 @@ class OpenAIClient {
 		console.log( 'Completion received and formatted : ', completion )
 
 		this.completionLogger.writeCompletion( prompt.messages[ prompt.messages.length - 1 ].content, completion )
+
+		this.vtsPlugin.triggerHotkey( "Look Chat" )
 
 		this.voiceMakerAPI.runTTS( completion )
 			.catch( ( error ) => {

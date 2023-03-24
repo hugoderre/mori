@@ -7,7 +7,7 @@ class StreamlabsApiClient {
 		this.OpenAIClient = OpenAIClient
 	}
 
-	async runSocket() {
+	async startListeners() {
 		const socket = io( `https://sockets.streamlabs.com?token=${process.env.STREAMLABS_SOCKET_TOKEN}`, {
 			transports: [ 'websocket' ]
 		} )

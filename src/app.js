@@ -11,23 +11,26 @@ class App {
 	}
 
 	async init() {
-		const twitchEventSub = new TwitchEventSub()
-
-		const vtsPlugin = new VtsPlugin( twitchEventSub )
+		const vtsPlugin = new VtsPlugin()
 		await vtsPlugin.init()
 
 		const messagesCollection = new MessagesCollection()
 		await messagesCollection.initClient()
 
-		const openAIClient = new OpenAIClient( this.expressApp, messagesCollection )
+		const openAIClient = new OpenAIClient( this.expressApp, messagesCollection, vtsPlugin )
 		openAIClient.listenCustomPrompt()
 		openAIClient.listenTestPrompt()
 
+		const twitchEventSub = new TwitchEventSub( openAIClient )
+		twitchEventSub.startListeners()
+
 		const tmi = new TmiApiClient( this.expressApp, openAIClient, messagesCollection )
-		tmi.startClient()
+		tmi.startListeners()
 
 		const streamlabs = new StreamlabsApiClient( openAIClient )
-		streamlabs.runSocket()
+		streamlabs.startListeners()
+
+
 	}
 }
 
