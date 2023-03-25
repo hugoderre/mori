@@ -21,7 +21,7 @@ class App {
 		openAIClient.listenCustomPrompt()
 		openAIClient.listenTestPrompt()
 
-		const twitchEventSub = new TwitchEventSub( openAIClient )
+		const twitchEventSub = new TwitchEventSub( openAIClient, vtsPlugin )
 		twitchEventSub.startListeners()
 
 		const tmi = new TmiApiClient( this.expressApp, openAIClient, messagesCollection )

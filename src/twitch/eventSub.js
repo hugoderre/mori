@@ -4,8 +4,9 @@ const fs = require( 'fs' ).promises
 require( 'dotenv' ).config()
 
 class TwitchEventSub {
-	constructor( openAiClient ) {
+	constructor( openAiClient, vtsPlugin ) {
 		this.openAiClient = openAiClient
+		this.vtsPlugin = vtsPlugin
 		this.clientId = process.env.TWITCH_CLIENT_ID
 		this.clientSecret = process.env.TWITCH_CLIENT_SECRET
 		this.userId = process.env.TWITCH_USER_ID
@@ -82,6 +83,24 @@ class TwitchEventSub {
 					},
 						'high'
 					)
+					break
+				case process.env.REWARD_ID_BG_SQUARES:
+					this.vtsPlugin.triggerHotkey( 'BackgroundSquares' )
+					break
+				case process.env.REWARD_ID_BG_FRUITS:
+					this.vtsPlugin.triggerHotkey( 'BackgroundFruits' )
+					break
+				case process.env.REWARD_ID_BG_SHIBAS:
+					this.vtsPlugin.triggerHotkey( 'BackgroundShibas' )
+					break
+				case process.env.REWARD_ID_BG_PARK:
+					this.vtsPlugin.triggerHotkey( 'BackgroundPark' )
+					break
+				case process.env.REWARD_ID_BG_PUDDING:
+					this.vtsPlugin.triggerHotkey( 'BackgroundPudding' )
+					break
+				case process.env.REWARD_ID_BG_DOKI:
+					this.vtsPlugin.triggerHotkey( 'BackgroundDoki' )
 					break
 				default:
 					break
