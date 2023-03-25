@@ -1,11 +1,13 @@
-const fs = require( 'fs' )
 const { spawn } = require( 'node:child_process' )
 const { VoiceMaker, VoiceMakerRequest } = require( 'voicemaker' )
+const SubTitle = require( './subtitle.js' )
 
 class VoiceMakerAPI {
 	constructor( openaiClientInstance ) {
 		this.openaiClientInstance = openaiClientInstance
 		this.voiceMakerEngine = new VoiceMaker()
+		this.subTitleEngine = new SubTitle( 3002 )
+		this.subTitleEngine.initServer()
 	}
 
 	async runTTS( message ) {
@@ -17,42 +19,12 @@ class VoiceMakerAPI {
 		voiceMakerRequest.pitch = "8%"
 		voiceMakerRequest.volume = 10
 		const outputPath = await this.voiceMakerEngine.getTts( voiceMakerRequest )
-		this.subTitleTTS( message )
+		this.subTitleEngine.send( message )
 		const vlcProcess = spawn( 'vlc', [ '--intf', 'dummy', '--no-video', '--play-and-exit', outputPath ] )
 		vlcProcess.on( 'close', ( code ) => {
 			this.openaiClientInstance.isCompletionInProcess = false
 			console.log( 'TTS DONE' )
 		} )
-	}
-
-	subTitleTTS( message ) {
-		const dir = './tmp'
-
-		if ( !fs.existsSync( dir ) ) {
-			fs.mkdirSync( dir );
-		}
-
-		const filePath = dir + '/tts-subtitle.txt'
-
-		const words = message.split( ' ' )
-
-		let wordIndex = 0
-		const interval = setInterval( () => {
-			if ( wordIndex < words.length ) {
-				const word = words[ wordIndex ]
-
-				if ( wordIndex === 0 ) {
-					fs.writeFileSync( filePath, word, 'utf8' )
-				} else {
-					fs.appendFileSync( filePath, ' ' + word, 'utf8' )
-				}
-
-				wordIndex++
-			} else {
-				clearInterval( interval )
-				setTimeout( () => fs.writeFileSync( filePath, '', 'utf8' ), 7000 )
-			}
-		}, 200 )
 	}
 }
 

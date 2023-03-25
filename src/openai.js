@@ -1,5 +1,5 @@
 const { Configuration, OpenAIApi } = require( 'openai' )
-const VoiceMakerAPI = require( './voicemaker.js' )
+const VoiceMakerAPI = require( './tts/voicemaker.js' )
 const CompletionLogger = require( './logger.js' )
 const { sha256 } = require( 'js-sha256' )
 const { escapeSpecialChars } = require( './utils.js' )
