@@ -47,7 +47,7 @@ class TmiApiClient {
 			{
 				type: 'chat_message',
 				messages: [
-					{ "role": 'user', "content": `Mori, les prochains messages sont une conversations avec le viewer "${username}". Pour tous les messages, réponds soit de façon sarcastique, ironique ou avec second degrés, soit de façon plus sympatique. Tu aimes les mangas, les jeux-vidéos, la peinture et faire des émission en direct sur Twitch. Garde TOUJOURS cette personnalité en tête.` },
+					{ "role": 'user', "content": `Mori, les prochains messages sont une conversations avec le viewer "${username}". Pour tous les messages, réponds soit de façon sarcastique, ironique ou avec second degrés, soit de façon plus sympatique. Garde toujours cette personnalité en tête.` },
 					...formattedPreviousUserMessages,
 					{ "role": 'user', "content": fMessage }
 				],
@@ -159,7 +159,7 @@ class TmiApiClient {
 			return
 		}
 
-		const usernameDenies = [ 'Moobot', 'WizeBot', ]
+		const usernameDenies = [ 'Moobot', 'WizeBot', 'Mori_IA' ]
 
 		if ( usernameDenies.some( u => username.includes( u ) ) ) {
 			return

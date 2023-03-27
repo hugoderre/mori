@@ -41,7 +41,7 @@ class TwitchEventSub {
 						type: 'vtsItemTrigger',
 						vtsHotkeyName: 'Drink',
 						messages: [
-							{ "role": 'user', "content": `Mori, le viewer "${data.userDisplayName}" vient de te donner une boisson pour te deshydrater. Remerçie le de façon sarcastique.` }
+							{ "role": 'user', "content": `Mori, le viewer "${data.userDisplayName}" vient de te donner une boisson pour t'hydrater. Remerçie le de façon sarcastique.` }
 						],
 						temperature: 0.9
 					},
