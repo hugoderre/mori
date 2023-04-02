@@ -1,11 +1,13 @@
 const { spawn } = require( 'node:child_process' )
 const { VoiceMaker, VoiceMakerRequest } = require( 'voicemaker' )
 const SubTitle = require( './subtitle.js' )
+const LanguageDetect = require( 'languagedetect' );
 
 class VoiceMakerAPI {
 	constructor( openaiClientInstance ) {
 		this.openaiClientInstance = openaiClientInstance
 		this.voiceMakerEngine = new VoiceMaker()
+		this.lngDetector = new LanguageDetect();
 		this.subTitleEngine = new SubTitle( 3002 )
 		this.subTitleEngine.initServer()
 	}
@@ -15,8 +17,15 @@ class VoiceMakerAPI {
 			throw new Error( 'No message provided.' )
 		}
 		const voiceMakerRequest = new VoiceMakerRequest( message )
-		voiceMakerRequest.setVoice( "ai3-fr-FR-Emmy" )
-		voiceMakerRequest.pitch = "8%"
+		const detectedLanguage = this.lngDetector.detect( message, 1 )[ 0 ][ 0 ]
+		if ( detectedLanguage === 'english' ) {
+			voiceMakerRequest.setVoice( "ai3-Nova" )
+			voiceMakerRequest.pitch = "-2%"
+			voiceMakerRequest.speed = "85%"
+		} else {
+			voiceMakerRequest.setVoice( "ai3-fr-FR-Emmy" )
+			voiceMakerRequest.pitch = "8%"
+		}
 		voiceMakerRequest.volume = 10
 		const outputPath = await this.voiceMakerEngine.getTts( voiceMakerRequest )
 		this.subTitleEngine.send( message )

@@ -100,13 +100,14 @@ class OpenAIClient {
 	async createChatCompletionWithRetryAndTimeout( prompt, maxRetries, retryDelay, timeout ) {
 		for ( let attempt = 1; attempt <= maxRetries; attempt++ ) {
 			try {
+				const completionSystemContext = prompt.system_context ?? "Actuellement tu t'entraines à Rocket League et tu réponds aux question sur le tchat.";
 				const completionPromise = this.api.createChatCompletion( {
 					model: process.env.OPENAI_CHAT_MODEL,
 					messages: [
 						{
 							role: 'system',
 							content:
-								"Tu t'appelles Mori, une streameuse sur Twitch avec du second degrés, du sarcasme, et aussi une personnalité attachante. Tu aimes les mangas, les jeux-vidéos, la peinture et faire des émission en direct sur Twitch. Tu réponds aux question sur le tchat.",
+								"Tu es Mori, une streameuse sur Twitch avec du second degrés, du sarcasme, et aussi une personnalité attachante. Tu aimes les mangas, les jeux-vidéos, la peinture et faire des lives sur Twitch. " + completionSystemContext,
 						},
 						...prompt.messages,
 					],
@@ -142,6 +143,31 @@ class OpenAIClient {
 			.replace( 'Mori :', '' )
 			.replace( ';)', '' )
 		return fCompletion
+	}
+
+	/**
+	 * Listen to RLBot POST requests, deny prompt if a chat completion is already in process
+	 */
+	listenRLBotPrompt() {
+		this.expressApp.post( '/rlbot-prompt', async ( req, res ) => {
+			if ( !req.body.messages ) {
+				return res.send( 'Wrong body format' )
+			}
+
+			// Process the prompt directly if no completion is in process
+			if ( !this.isCompletionInProcess ) {
+				this.runChatCompletion( {
+					messages: req.body.messages,
+					temperature: req.body.temperature ?? 0.8,
+					max_tokens: req.body.max_tokens ?? 100,
+					system_context: `Tu t'entraines actuellement à Rocket League (apprentissage par renforcement). Les prochaines phrases sont des évenements de ce qui se passe dans ton match, réagis y.`,
+				} )
+			} else {
+				return res.send( 'Completion in process' )
+			}
+
+			return res.send( 'RLBot prompt done' )
+		} )
 	}
 
 	listenCustomPrompt() {

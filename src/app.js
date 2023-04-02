@@ -18,6 +18,7 @@ class App {
 		await messagesCollection.initClient()
 
 		const openAIClient = new OpenAIClient( this.expressApp, messagesCollection, vtsPlugin )
+		openAIClient.listenRLBotPrompt()
 		openAIClient.listenCustomPrompt()
 		openAIClient.listenTestPrompt()
 
