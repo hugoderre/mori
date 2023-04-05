@@ -102,6 +102,9 @@ class TwitchEventSub {
 				case process.env.REWARD_ID_BG_DOKI:
 					this.vtsPlugin.triggerHotkey( 'BackgroundDoki' )
 					break
+				case process.env.REWARD_ID_BG_BEDROOM:
+					this.vtsPlugin.triggerHotkey( 'BackgroundBedroom' )
+					break
 				default:
 					break
 			}
