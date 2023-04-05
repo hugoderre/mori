@@ -56,7 +56,10 @@ class OpenAIClient {
 		this.isCompletionInProcess = true
 		let completionObj
 
-		this.vtsPlugin.triggerHotkey( "Look Chat" )
+		if ( prompt.type === 'chat_message' ) {
+			this.vtsPlugin.triggerHotkey( "Look Chat" )
+		}
+
 		try {
 			completionObj = await this.createChatCompletionWithRetryAndTimeout( prompt, 3, 1000, 11000 );
 		} catch ( error ) {
@@ -82,7 +85,9 @@ class OpenAIClient {
 
 		this.completionLogger.writeCompletion( prompt.messages[ prompt.messages.length - 1 ].content, completion )
 
-		this.vtsPlugin.triggerHotkey( "Look Chat" )
+		if ( prompt.type === 'chat_message' ) {
+			this.vtsPlugin.triggerHotkey( "Look Chat" )
+		}
 
 		this.voiceMakerAPI.runTTS( completion )
 			.catch( ( error ) => {
