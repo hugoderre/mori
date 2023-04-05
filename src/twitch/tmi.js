@@ -51,7 +51,7 @@ class TmiApiClient {
 					...formattedPreviousUserMessages,
 					{ "role": 'user', "content": fMessage }
 				],
-				temperature: 0.8,
+				temperature: 1,
 				username
 			},
 			'low'
