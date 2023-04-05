@@ -75,8 +75,8 @@ class SubTitle {
 					width: fit-content;
 					text-align: center;
 					display: inline-block;
-					-webkit-text-stroke: 1px black;
-					text-stroke: 1px black;
+					-webkit-text-stroke: 2px black;
+					text-stroke: 2px black;
 					color: white;
 					text-shadow: 1px 1px black;
 					line-height: 1.2;
