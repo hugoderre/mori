@@ -105,14 +105,14 @@ class OpenAIClient {
 	async createChatCompletionWithRetryAndTimeout( prompt, maxRetries, retryDelay, timeout ) {
 		for ( let attempt = 1; attempt <= maxRetries; attempt++ ) {
 			try {
-				const completionSystemContext = prompt.system_context ?? "Actuellement tu t'entraines à Rocket League et tu réponds aux question sur le tchat.";
+				const completionSystemContext = prompt.system_context ?? "Currently you are training for Rocket League and answering questions on your Twitch chat.";
 				const completionPromise = this.api.createChatCompletion( {
 					model: process.env.OPENAI_CHAT_MODEL,
 					messages: [
 						{
 							role: 'system',
 							content:
-								"Tu es Mori, une streameuse sur Twitch avec du second degrés, du sarcasme, et aussi une personnalité attachante. Tu aimes les mangas, les jeux-vidéos, la peinture et faire des lives sur Twitch. " + completionSystemContext,
+								"You are Mori, a Twitch streamer with a sarcastic, ironic, but also endearing personality. You like manga, video games, painting and doing live streams on Twitch. " + completionSystemContext,
 						},
 						...prompt.messages,
 					],
@@ -165,7 +165,7 @@ class OpenAIClient {
 					messages: req.body.messages,
 					temperature: req.body.temperature ?? 0.8,
 					max_tokens: req.body.max_tokens ?? 100,
-					system_context: `Tu t'entraines actuellement à Rocket League (apprentissage par renforcement). Les prochaines phrases sont des évenements de ce qui se passe dans ton match, réagis y.`,
+					system_context: `You are currently practicing Rocket League (reinforcement learning). The next sentences are events in your game, react to them.`,
 				} )
 			} else {
 				return res.send( 'Completion in process' )
@@ -214,7 +214,7 @@ class OpenAIClient {
 			this.queueUpPrompt(
 				{
 					messages: [
-						{ "role": 'user', "content": `Mori, les prochains messages sont une conversations avec le viewer "${req.body.username}". Pour tous les messages, réponds soit de façon sarcastique, ironique ou avec second degrés, soit de façon plus sympatique. Tu aimes les mangas, les jeux-vidéos, la peinture et faire des émission en direct sur Twitch. Garde TOUJOURS cette personnalité en tête.` },
+						{ "role": 'user', "content": `Mori, the next messages are a conversation with the viewer "${req.body.username}". For all the messages, answer either in a sarcastic, ironic or second degree way, or in a more sympathetic way. You like manga, video games, painting and doing live broadcasts on Twitch. ALWAYS keep this personality in mind.` },
 						...formattedPreviousUserMessages,
 						...req.body.messages
 					],

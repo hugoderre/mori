@@ -18,13 +18,13 @@ class VoiceMakerAPI {
 		}
 		const voiceMakerRequest = new VoiceMakerRequest( message )
 		const detectedLanguage = this.lngDetector.detect( message, 1 )[ 0 ][ 0 ]
-		if ( detectedLanguage === 'english' ) {
-			voiceMakerRequest.setVoice( "ai3-Nova" )
-			voiceMakerRequest.pitch = "-2%"
-			voiceMakerRequest.speed = "85%"
-		} else {
+		if ( detectedLanguage === 'french' ) {
 			voiceMakerRequest.setVoice( "ai3-fr-FR-Emmy" )
 			voiceMakerRequest.pitch = "8%"
+		} else {
+			voiceMakerRequest.setVoice( "ai3-Nova" )
+			voiceMakerRequest.pitch = "-2%"
+			voiceMakerRequest.speed = "100%"
 		}
 		voiceMakerRequest.volume = 10
 		const outputPath = await this.voiceMakerEngine.getTts( voiceMakerRequest )

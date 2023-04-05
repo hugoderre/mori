@@ -41,7 +41,7 @@ class TwitchEventSub {
 						type: 'vtsItemTrigger',
 						vtsHotkeyName: 'Drink',
 						messages: [
-							{ "role": 'user', "content": `Mori, le viewer "${data.userDisplayName}" vient de te donner une boisson pour t'hydrater. Remerçie le de façon sarcastique.` }
+							{ "role": 'user', "content": `Mori, the viewer "${data.userDisplayName}" just gave you a drink to hydrate you. Thank him sarcastically.` }
 						],
 						temperature: 0.9
 					},
@@ -53,7 +53,7 @@ class TwitchEventSub {
 						type: 'vtsItemTrigger',
 						vtsHotkeyName: 'Pet the Mori',
 						messages: [
-							{ "role": 'user', "content": `Mori, le viewer "${data.userDisplayName}" vient de te caresser la tête virtuellement. Remerçie le de façon amusée et sarcastique.` }
+							{ "role": 'user', "content": `Mori, the viewer "${data.userDisplayName}" just patted your head virtually. Thank him in an amused and sarcastic way.` }
 						],
 						temperature: 0.9
 					},
@@ -65,7 +65,7 @@ class TwitchEventSub {
 						type: 'vtsItemTrigger',
 						vtsHotkeyName: 'Sunglasses',
 						messages: [
-							{ "role": 'user', "content": `Mori, le viewer "${data.userDisplayName}" vient de te mettre des lunettes de soleil. Remerçie le de façon amusée et sarcastique.` }
+							{ "role": 'user', "content": `Mori, the "${data.userDisplayName}" viewer just put sunglasses on you. Thank him in an amused and sarcastic way.` }
 						],
 						temperature: 0.9
 					},
@@ -77,7 +77,7 @@ class TwitchEventSub {
 						type: 'vtsItemTrigger',
 						vtsHotkeyName: 'Hammer',
 						messages: [
-							{ "role": 'user', "content": `Mori, le viewer "${data.userDisplayName}" vient de te mettre un coup de marteau virtuel. Réagis à ça de façon amusée et sarcastique.` }
+							{ "role": 'user', "content": `Mori, the "${data.userDisplayName}" viewer just hit you with a virtual hammer. React to this in an amused and sarcastic way.` }
 						],
 						temperature: 0.9
 					},

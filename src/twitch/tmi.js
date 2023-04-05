@@ -47,7 +47,7 @@ class TmiApiClient {
 			{
 				type: 'chat_message',
 				messages: [
-					{ "role": 'user', "content": `Mori, les prochains messages sont une conversations avec le viewer "${username}". Pour tous les messages, réponds soit de façon sarcastique, ironique ou avec second degrés, soit de façon plus sympatique. Garde toujours cette personnalité en tête.` },
+					{ "role": 'user', "content": `Mori, the next messages are a conversation with the viewer "${username}". For all messages, respond either in a sarcastic, ironic or second degree way, or in a more sympathetic way. Always keep this personality in mind.` },
 					...formattedPreviousUserMessages,
 					{ "role": 'user', "content": fMessage }
 				],
@@ -75,7 +75,7 @@ class TmiApiClient {
 		this.openAIClient.queueUpPrompt( {
 			type: 'sub',
 			messages: [
-				{ "role": 'user', "content": `Mori, le viewer "${username}" vient de s'abonner à ta chaine Twitch pour la première fois. Remerçie le chaleureusement et de façon conçise.` }
+				{ "role": 'user', "content": `Mori, the viewer "${username}" just subscribed to your Twitch channel for the first time. Please thank him warmly and in a nice way.` }
 			],
 			temperature: 0.5,
 			username: username
@@ -88,7 +88,7 @@ class TmiApiClient {
 		this.openAIClient.queueUpPrompt( {
 			type: 'cheer',
 			messages: [
-				{ "role": 'user', "content": `Mori, le viewer "${tags.username}" vient d'offrir ${tags.bits} bits à ta chaine Twitch. Remerçie le chaleureusement et de façon conçise.` }
+				{ "role": 'user', "content": `Mori, the viewer "${tags.username}" has just offered ${tags.bits} bits to your Twitch channel. Please thank him warmly and in a nice way.` }
 			],
 			temperature: 0.5,
 			username: tags.username
@@ -101,7 +101,7 @@ class TmiApiClient {
 		this.openAIClient.queueUpPrompt( {
 			type: 'resub',
 			messages: [
-				{ "role": 'user', "content": `Mori, le viewer "${username}" vient de se réabonner à ta chaine Twitch. C'est son ${tags[ 'badge-info' ].subscriber}ème mois d'abonnement. Remerçie le chaleureusement et de façon conçise.` }
+				{ "role": 'user', "content": `Mori, the viewer "${username}" has just re-subscribed to your Twitch channel. This is his ${tags[ 'badge-info' ].subscriber}th month of subscription. Please thank him warmly and in a nice way.` }
 			],
 			temperature: 0.5,
 			username: username
@@ -114,7 +114,7 @@ class TmiApiClient {
 		this.openAIClient.queueUpPrompt( {
 			type: 'subgift',
 			messages: [
-				{ "role": 'user', "content": `Mori, le viewer "${username}" vient d'offrir un abonnement cadeau à ${recipient} à ta chaine Twitch. Remerçie ${username} chaleureusement et de façon conçise.` }
+				{ "role": 'user', "content": `Mori, the viewer "${username}" has just offered a gift subscription to ${recipient} to your Twitch channel. Please thank ${username} warmly and in a nice way.` }
 			],
 			temperature: 0.5,
 			username: username
@@ -127,7 +127,7 @@ class TmiApiClient {
 		this.openAIClient.queueUpPrompt( {
 			type: 'anonsubgift',
 			messages: [
-				{ "role": 'user', "content": `Mori, un viewer anonyme vient d'offrir un abonnement cadeau à ${recipient} à ta chaine Twitch. Remerçie ce viewer anonyme chaleureusement et de façon conçise.` }
+				{ "role": 'user', "content": `Mori, an anonymous viewer just offered a gift subscription to ${recipient} to your Twitch channel. Please thank this anonymous viewer warmly and in a creative way.` }
 			],
 			temperature: 0.5,
 			username: ''
@@ -140,7 +140,7 @@ class TmiApiClient {
 		this.openAIClient.queueUpPrompt( {
 			type: 'raid',
 			messages: [
-				{ "role": 'user', "content": `Mori, tu viens de recevoir un raid sur ta chaine Twitch de la part de ${username}, remerçie le et souhaite la bienvenue aux ${viewers} viewers !` }
+				{ "role": 'user', "content": `Mori, you just received a raid on your Twitch channel from ${username}, thank him warmly and welcome the ${viewers} viewers!` }
 			],
 			temperature: 0.5,
 			username: username
@@ -166,6 +166,7 @@ class TmiApiClient {
 		}
 
 		const firstCharDenies = [ '@', '!', '/' ]
+
 		if ( firstCharDenies.some( c => message[ 0 ].includes( c ) ) ) {
 			return
 		}

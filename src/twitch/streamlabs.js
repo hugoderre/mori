@@ -24,7 +24,7 @@ class StreamlabsApiClient {
 						{
 							type,
 							messages: [
-								{ "role": "user", "content": `Mori, le viewer "${eventData.message[ 0 ].name}" vient de follow ta chaine twitch ! Souhaite lui la bienvenue de façon concise.` }
+								{ "role": "user", "content": `Mori, the viewer "${eventData.message[ 0 ].name}" just followed your twitch channel! Welcome him in a concise way.` }
 							],
 							temperature: 0.9,
 							username: ''
@@ -37,7 +37,7 @@ class StreamlabsApiClient {
 						{
 							type,
 							messages: [
-								{ "role": "user", "content": `Mori, le viewer "${eventData.message[ 0 ].name}" vient de donner ${eventData.message[ 0 ].formatted_amount} à ta chaine Twitch ! Remercie le très chaleureuse.` }
+								{ "role": "user", "content": `Mori, the viewer "${eventData.message[ 0 ].name}" just gave ${eventData.message[ 0 ].formatted_amount} to your Twitch channel! Thank him very warmly.` }
 							],
 							temperature: 0.8,
 							username: ''
