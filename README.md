@@ -1,10 +1,10 @@
 # Mori - Une Streameuse Twitch avec Intelligence Artificielle
 
-Mori est une streameuse Twitch animée par une intelligence artificielle, créée en utilisant l'API d'OpenAI. Elle utilise un modèle 3D (modèle par *omiso0001212*) sur VTube Studio pour représenter son avatar et la synthèse vocale (TTS) via Voicemaker pour communiquer avec les spectateurs.
+Mori est une streameuse Twitch animée par une intelligence artificielle, créée en utilisant l'API d'OpenAI. Elle utilise un modèle Live2D (modèle par *omiso0001212*) sur VTube Studio pour représenter son avatar et la synthèse vocale (TTS) via Voicemaker pour communiquer avec les spectateurs.
 
 ## Comment ça fonctionne ?
 
-Mori utilise un script en Node.js pour interagir avec l'API d'OpenAI et générer des réponses en temps réel aux messages du chat Twitch. Les messages du chat sont analysés par l'API d'OpenAI et la réponse générée est convertie en voix via Voicemaker. Mori utilise ensuite le modèle 3D sur VTube Studio pour synchroniser les mouvements de sa bouche avec les paroles générées.
+Mori utilise un script en Node.js pour interagir avec l'API d'OpenAI et générer des réponses en temps réel aux messages du chat Twitch. Les messages du chat sont analysés par l'API d'OpenAI et la réponse générée est convertie en voix via Voicemaker. Mori utilise ensuite le modèle Live2D sur VTube Studio pour synchroniser les mouvements de sa bouche avec les paroles générées.
 
 ## Configuration requise
 
