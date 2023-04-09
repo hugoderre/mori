@@ -1,38 +1,17 @@
-# Mori - Une Streameuse Twitch avec Intelligence Artificielle
+# Mori - A Twitch Streamer with Artificial Intelligence
 
-Mori est une streameuse Twitch animée par une intelligence artificielle, créée en utilisant l'API d'OpenAI. Elle utilise un modèle Live2D (modèle par *omiso0001212*) sur VTube Studio pour représenter son avatar et la synthèse vocale (TTS) via Voicemaker pour communiquer avec les spectateurs.
+Mori is a Twitch streamer powered by OpenAI model language API. She uses a Live2D model (template by *omiso0001212*) on VTube Studio to represent her avatar and text-to-speech (TTS) via Voicemaker to communicate with viewers.
 
-## Comment ça fonctionne ?
+This repository also contains other Mori's features like RLBot or MoriSing.
 
-Mori utilise un script en Node.js pour interagir avec l'API d'OpenAI et générer des réponses en temps réel aux messages du chat Twitch. Les messages du chat sont analysés par l'API d'OpenAI et la réponse générée est convertie en voix via Voicemaker. Mori utilise ensuite le modèle Live2D sur VTube Studio pour synchroniser les mouvements de sa bouche avec les paroles générées.
+## How does it work?
 
-## Configuration requise
+Mori uses a Node.js script to interact with the OpenAI API and generate real-time responses to Twitch chat messages. The chat messages are parsed by the OpenAI API and the generated response is converted to voice via Voicemaker. Mori then uses the Live2D model on VTube Studio to synchronize his mouth movements with the generated speech.
 
-Pour utiliser Mori, vous aurez besoin des éléments suivants :
+## Intellectual Property
 
-- Un compte Twitch actif
-- Les clés d'API nécessaires pour accéder à l'API d'OpenAI et à Voicemaker
-- Un modèle 3D créé avec VTube Studio
+The source code of Mori is the exclusive property of Hugo Derré. All rights are reserved. You are allowed to use the source code only for personal contribution, research or experimentation.
 
-## Comment utiliser Mori
+It is strictly forbidden to distribute, copy or modify the source code outside the framework defined in the previous line. Only Hugo Derré is authorized to launch streams using the source code of Mori.
 
-1. Clonez le dépôt sur votre ordinateur.
-2. Installez les dépendances en exécutant `npm install`.
-3. Créez un fichier `.env` pour stocker les clés d'API nécessaires :
-
-    ```
-    OPENAI_API_KEY=<Votre clé OpenAI>
-    OPENAI_CHAT_MODEL=<Le model de completion>
-    STREAMLABS_SOCKET_TOKEN=<Votre clé OpenAI>
-    ```
-    
-4. Faire un `export VOICEMAKER_IN_TOKEN=<Votre token VoiceMaker>` sur votre système pour pouvoir utiliser VoiceMaker lorsque le script sera lancé.
-5. Lancez Mori en exécutant `npm start`.
-
-## Propriété intellectuelle
-
-Le code source de Mori est la propriété exclusive de Hugo Derré. Tous les droits sont réservés. Vous êtes autorisé à utiliser le code source uniquement à des fins de contribution, de recherche ou d'expérimentation personnelles.
-
-Il est strictement interdit de distribuer, de copier ou de modifier le code source hors du cadre défini dans la ligne précédente. Seul Hugo Derré est autorisé à lancer des streams en utilisant le code source de Mori.
-
-Toute utilisation non autorisée du code source de Mori peut entraîner des mesures juridiques. Si vous avez des questions ou souhaitez obtenir une autorisation pour utiliser le code source à des fins commerciales, veuillez contacter Hugo Derré à l'adresse suivante : contact@hugoderre.com.
+Any unauthorized use of the Mori source code may result in legal action. If you have any questions or wish to obtain an authorization to use the source code for commercial purposes, please contact Hugo Derré at the following address: contact@hugoderre.com.
