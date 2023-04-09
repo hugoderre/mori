@@ -8,7 +8,7 @@ class CompletionLogger {
 	}
 
 	initLogFile() {
-		const logDir = './data';
+		const logDir = './data/completions';
 		const logFilePath = `${logDir}/completion${getDateISO()}.tsv`;
 
 		if ( !fs.existsSync( logDir ) ) {
