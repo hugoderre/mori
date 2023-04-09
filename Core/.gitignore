@@ -1,0 +1,7 @@
+.env
+/node_modules/
+/markdown/
+/data/
+/tmp/
+mori-setup.md
+notes.md
