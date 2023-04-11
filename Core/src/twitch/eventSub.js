@@ -4,9 +4,10 @@ const fs = require( 'fs' ).promises
 require( 'dotenv' ).config()
 
 class TwitchEventSub {
-	constructor( openAiClient, vtsPlugin ) {
+	constructor( openAiClient, vtsPlugin, songRequest ) {
 		this.openAiClient = openAiClient
 		this.vtsPlugin = vtsPlugin
+		this.songRequest = songRequest
 		this.clientId = process.env.TWITCH_CLIENT_ID
 		this.clientSecret = process.env.TWITCH_CLIENT_SECRET
 		this.userId = process.env.TWITCH_USER_ID
@@ -104,6 +105,18 @@ class TwitchEventSub {
 					break
 				case process.env.REWARD_ID_BG_BEDROOM:
 					this.vtsPlugin.triggerHotkey( 'BackgroundBedroom' )
+					break
+				case process.env.REWARD_ID_SONG_REQUEST:
+					this.openAiClient.queueUpPrompt( {
+						type: 'chat_message',
+						messages: [
+							{ "role": 'user', "content": `Mori, the "${data.userDisplayName}" viewer has just made a song request for the youtube music "${data.message}". Tell him you are learning the music right now and will play it in 5 minutes!` }
+						],
+						temperature: 0.9
+					},
+						'high'
+					)
+					this.songRequest.queueUpSongRequest( data.message )
 					break
 				default:
 					break

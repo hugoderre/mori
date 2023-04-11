@@ -4,6 +4,7 @@ const TwitchEventSub = require( './twitch/eventSub.js' )
 const StreamlabsApiClient = require( './twitch/streamlabs.js' )
 const TmiApiClient = require( './twitch/tmi.js' )
 const VtsPlugin = require( './vts.js' )
+const SongRequest = require( './songRequest.js' )
 
 class App {
 	constructor( expressApp ) {
@@ -22,7 +23,9 @@ class App {
 		openAIClient.listenCustomPrompt()
 		openAIClient.listenTestPrompt()
 
-		const twitchEventSub = new TwitchEventSub( openAIClient, vtsPlugin )
+		const songRequest = new SongRequest( this.expressApp, openAIClient )
+
+		const twitchEventSub = new TwitchEventSub( openAIClient, vtsPlugin, songRequest )
 		twitchEventSub.startListeners()
 
 		const tmi = new TmiApiClient( this.expressApp, openAIClient, messagesCollection )

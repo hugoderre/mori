@@ -105,7 +105,8 @@ class OpenAIClient {
 	async createChatCompletionWithRetryAndTimeout( prompt, maxRetries, retryDelay, timeout ) {
 		for ( let attempt = 1; attempt <= maxRetries; attempt++ ) {
 			try {
-				const completionSystemContext = prompt.system_context ?? "Currently you are training for Rocket League and answering questions on your Twitch chat.";
+				const completionSystemContext = prompt.system_context ?? "Currently you are answering questions on your Twitch chat and awaiting for song request.";
+				// const completionSystemContext = prompt.system_context ?? "Currently you are training for Rocket League and answering questions on your Twitch chat.";
 				const completionPromise = this.api.createChatCompletion( {
 					model: process.env.OPENAI_CHAT_MODEL,
 					messages: [
