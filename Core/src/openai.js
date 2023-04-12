@@ -20,7 +20,8 @@ class OpenAIClient {
 			high: []
 		}
 		this.promptQueueIntervalRef = null
-		this.isCompletionInProcess = false
+		this.isMoriSpeaking = false
+		this.isSongRequestInProcess = false
 		this.initPromptQueue()
 	}
 
@@ -36,9 +37,17 @@ class OpenAIClient {
 		this.promptQueue[ priority ].push( prompt )
 	}
 
+	queueReset() {
+		this.promptQueue = {
+			low: [],
+			medium: [],
+			high: []
+		}
+	}
+
 	initPromptQueue() {
 		this.promptQueueIntervalRef = setInterval( async () => {
-			if ( this.isCompletionInProcess ) {
+			if ( this.isMoriSpeaking ) {
 				return
 			}
 			const priorities = [ 'high', 'medium', 'low' ]
@@ -53,7 +62,7 @@ class OpenAIClient {
 	}
 
 	async runChatCompletion( prompt ) {
-		this.isCompletionInProcess = true
+		this.isMoriSpeaking = true
 		let completionObj
 
 		if ( prompt.type === 'chat_message' ) {
@@ -63,7 +72,7 @@ class OpenAIClient {
 		try {
 			completionObj = await this.createChatCompletionWithRetryAndTimeout( prompt, 3, 1000, 11000 );
 		} catch ( error ) {
-			this.isCompletionInProcess = false
+			this.isMoriSpeaking = false
 			console.error( "Erreur lors de la création de la completion :", error );
 			return
 		}
@@ -76,7 +85,7 @@ class OpenAIClient {
 		try {
 			completion = this.completionPostFormatting( escapeSpecialChars( completionObj.data.choices[ 0 ].message.content ) )
 		} catch ( error ) {
-			this.isCompletionInProcess = false
+			this.isMoriSpeaking = false
 			console.error( "Erreur lors du formatage de la completion :", error );
 			return
 		}
@@ -92,7 +101,7 @@ class OpenAIClient {
 		this.voiceMakerAPI.runTTS( completion )
 			.catch( ( error ) => {
 				console.error( 'Erreur lors du traitement Text-to-Speech : ', error )
-				this.isCompletionInProcess = false
+				this.isMoriSpeaking = false
 			} );
 
 		this.expressApp.emit( 'completion_completed', {
@@ -161,7 +170,7 @@ class OpenAIClient {
 			}
 
 			// Process the prompt directly if no completion is in process
-			if ( !this.isCompletionInProcess ) {
+			if ( !this.isMoriSpeaking ) {
 				this.runChatCompletion( {
 					messages: req.body.messages,
 					temperature: req.body.temperature ?? 1,

@@ -1,5 +1,7 @@
 const tmi = require( 'tmi.js' )
 const { escapeSpecialChars } = require( './../utils.js' )
+const dotenv = require( 'dotenv' )
+dotenv.config()
 
 class TmiApiClient {
 	constructor( expressApp, openAIClient, messagesCollection ) {
@@ -30,6 +32,10 @@ class TmiApiClient {
 		const fMessage = escapeSpecialChars( message )
 
 		if ( !this.isValidChatMessage( username, fMessage ) ) {
+			return
+		}
+
+		if ( tags[ 'custom-reward-id' ] === process.env.REWARD_ID_SONG_REQUEST ) {
 			return
 		}
 
@@ -149,17 +155,13 @@ class TmiApiClient {
 		)
 	}
 
-	redeemCallback( channel, username, rewardtype, tags, msg ) {
-		console.log( 'pass' )
-		console.log( channel, username, rewardtype, tags, msg )
-	}
-
 	isValidChatMessage( username, message ) {
 		if ( !message || message.length > 300 ) {
 			return
 		}
 
-		const usernameDenies = [ 'Moobot', 'WizeBot', 'Mori_IA' ]
+		const usernameDenies = [ 'Moobot', 'WizeBot' ]
+		// const usernameDenies = [ 'Moobot', 'WizeBot', 'Mori_IA' ]
 
 		if ( usernameDenies.some( u => username.includes( u ) ) ) {
 			return

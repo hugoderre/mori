@@ -3,5 +3,9 @@
 /markdown/
 /data/
 /tmp/
+src/tts/tts-subtitle.html
+src/song-request/models/G_4000.pth
+src/song-request/songs/
+src/song-request/htdemucs/
 mori-setup.md
 notes.md

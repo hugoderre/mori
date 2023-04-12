@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/hugoderre/mori#readme",
   "dependencies": {
+    "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "@twurple/api": "^6.0.9",
     "@twurple/eventsub-http": "^6.0.9",
     "@twurple/eventsub-ngrok": "^6.0.9",
@@ -30,6 +31,7 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "express-session": "^1.15.2",
+    "fluent-ffmpeg": "^2.1.2",
     "handlebars": "^4.0.6",
     "js-sha256": "^0.9.0",
     "languagedetect": "^2.0.0",
@@ -37,11 +39,13 @@
     "openai": "^3.2.1",
     "passport": "^0.3.2",
     "passport-oauth": "^1.0.0",
+    "play-sound": "^1.1.5",
     "request": "^2.81.0",
     "socket.io-client": "^2.*",
     "tmi.js": "^1.8.5",
     "validator": "^13.9.0",
     "voicemaker": "^0.2.4",
-    "ws": "^8.13.0"
+    "ws": "^8.13.0",
+    "ytdl-core": "github:fent/node-ytdl-core#pull/1203/head"
   }
 }

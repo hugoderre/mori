@@ -4,7 +4,7 @@ const TwitchEventSub = require( './twitch/eventSub.js' )
 const StreamlabsApiClient = require( './twitch/streamlabs.js' )
 const TmiApiClient = require( './twitch/tmi.js' )
 const VtsPlugin = require( './vts.js' )
-const SongRequest = require( './songRequest.js' )
+const SongRequest = require( './song-request/songRequest.js' )
 
 class App {
 	constructor( expressApp ) {
