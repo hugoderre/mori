@@ -12,13 +12,7 @@ class SubTitle {
 	}
 
 	async initServer() {
-		const dir = './tmp'
-
-		if ( !fs.existsSync( dir ) ) {
-			fs.mkdirSync( dir )
-		}
-
-		const filePath = dir + '/tts-subtitle.html'
+		const filePath = 'src/tts/tts-subtitle.html'
 		const html = this.generateSubtitleHTML()
 
 		fs.writeFileSync( filePath, html, 'utf8' )
