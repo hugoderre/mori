@@ -16,7 +16,7 @@ class VoiceMakerAPI {
 		}
 		const voiceMakerRequest = new VoiceMakerRequest( message )
 		voiceMakerRequest.setVoice( "ai3-Nova" )
-		voiceMakerRequest.pitch = "6%"
+		voiceMakerRequest.pitch = "8%"
 		voiceMakerRequest.speed = "100%"
 		voiceMakerRequest.volume = 10
 		const outputPath = await this.voiceMakerEngine.getTts( voiceMakerRequest )

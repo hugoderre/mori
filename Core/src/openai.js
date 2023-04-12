@@ -122,7 +122,7 @@ class OpenAIClient {
 						{
 							role: 'system',
 							content:
-								"You are Mori, a female Twitch streamer with a sarcastic and ironic personality. You like manga, video games, painting and doing live streams on Twitch. " + completionSystemContext,
+								"You are Mori, a female Twitch streamer with a weird, cute and sarcastic personality. You like manga, video games and doing live streams on Twitch. " + completionSystemContext,
 						},
 						...prompt.messages,
 					],
@@ -224,7 +224,7 @@ class OpenAIClient {
 			this.queueUpPrompt(
 				{
 					messages: [
-						{ "role": 'user', "content": `Mori, the next messages are a conversation with the viewer "${req.body.username}". For all the messages, answer either in a sarcastic, ironic or second degree way, or in a more sympathetic way. You like manga, video games, painting and doing live broadcasts on Twitch. ALWAYS keep this personality in mind.` },
+						{ "role": 'user', "content": `Mori, the next messages are a conversation with the viewer "${req.body.username}". For all the messages, answer either in a weird, sarcastic or cute way, like UwU. You like manga, video games, and doing live broadcasts on Twitch. ALWAYS keep this personality in mind.` },
 						...formattedPreviousUserMessages,
 						...req.body.messages
 					],
