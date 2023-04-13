@@ -131,6 +131,15 @@ class SongRequest {
 				'src/song-request/htdemucs/base_song/vocals.wav',
 			] )
 
+			// infer.stdout.on( 'data', ( data ) => {
+			// 	console.log( `stdout: ${data}` )
+			// } )
+
+			infer.stderr.on( 'data', ( data ) => {
+				console.error( `stderr: ${data}` )
+				reject( `stderr: ${data}` )
+			} )
+
 			infer.on( 'close', ( code ) => {
 				resolve( 'Inference Done' )
 			} )
@@ -140,6 +149,8 @@ class SongRequest {
 	async startSong() {
 		return new Promise( ( resolve, reject ) => {
 			const singingProcess = spawn( 'vlc', [ '--intf', 'dummy', '--no-video', '--play-and-exit', '--aout=waveout', '--waveout-audio-device=VX238 (NVIDIA High Definition A ($1,$64)', 'src/song-request/htdemucs/base_song/no_vocals.wav' ] )
+			// const singingProcess = spawn( 'vlc', [ '--intf', 'dummy', '--no-video', '--play-and-exit', '--aout=waveout', '--waveout-audio-device=VoiceMeeter Input (VB-Audio Voi ($1,$64)', 'src/song-request/htdemucs/base_song/no_vocals.wav' ] )
+			// const singingProcess = spawn( 'vlc', [ '--intf', 'dummy', '--no-video', '--play-and-exit', '--aout=waveout', '--waveout-audio-device=Haut-parleurs (2- Focusrite USB ($1,$64)', 'src/song-request/htdemucs/base_song/no_vocals.wav' ] )
 			spawn( 'vlc', [ '--intf', 'dummy', '--no-video', '--play-and-exit', '--aout=waveout', '--waveout-audio-device=VoiceMeeter Input (VB-Audio Voi ($1,$64)', 'src/song-request/htdemucs/base_song/vocals.out.wav' ] )
 			singingProcess.on( 'close', ( code ) => {
 				resolve( 'Singing Done' )
