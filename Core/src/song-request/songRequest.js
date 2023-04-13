@@ -12,6 +12,8 @@ class SongRequest {
 		this.songrequestId = 0
 		this.pendingSongRequests = []
 		this.isSongRequestInProcess = false
+		this.youtubeUrl = ''
+		this.chunkSeconds = 0.5
 		this.listenSongRequestApproval()
 	}
 
@@ -59,7 +61,9 @@ class SongRequest {
 				return res.send( 'Youtube URL not provided.' )
 			}
 
-			const isSongSuccessfullyBuilded = this.buildSong( req.body.youtube_url )
+			this.youtubeUrl = req.body.youtube_url
+			this.chunkSeconds = req.body.chunkSeconds ?? 0.5
+			const isSongSuccessfullyBuilded = this.buildSong()
 
 			if ( !isSongSuccessfullyBuilded ) {
 				return res.send( 'Song could not be builded.' )
@@ -70,9 +74,9 @@ class SongRequest {
 		} )
 	}
 
-	async buildSong( youtubeUrl ) {
+	async buildSong() {
 		try {
-			await this.downloadSong( youtubeUrl )
+			await this.downloadSong()
 			await this.separateSong()
 			this.openAiClient.isMoriSpeaking = true
 			console.log( 'Start Inference' )
@@ -88,12 +92,12 @@ class SongRequest {
 		this.openAiClient.isMoriSpeaking = false
 	}
 
-	async downloadSong( videoUrl ) {
+	async downloadSong() {
 		return new Promise( ( resolve, reject ) => {
 			if ( !fs.existsSync( 'src/song-request/songs' ) ) {
 				fs.mkdirSync( 'src/song-request/songs' );
 			}
-			ytdl( videoUrl, {
+			ytdl( this.youtubeUrl, {
 				filter: "audioonly",
 				quality: "highest",
 			} )
@@ -121,6 +125,7 @@ class SongRequest {
 
 	async inferSong() {
 		return new Promise( ( resolve, reject ) => {
+			console.log( 'chunkSeconds', this.chunkSeconds )
 			const infer = spawn( 'svc', [
 				'infer',
 				'--model-path=src/song-request/models/G_4000.pth',
@@ -128,6 +133,7 @@ class SongRequest {
 				'--transpose=0',
 				'--no-auto-predict-f0',
 				'--f0-method=crepe',
+				`--chunk-seconds=${this.chunkSeconds}`,
 				'src/song-request/htdemucs/base_song/vocals.wav',
 			] )
 
