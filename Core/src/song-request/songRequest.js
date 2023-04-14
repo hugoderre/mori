@@ -6,9 +6,10 @@ ffmpeg.setFfmpegPath( ffmpegPath )
 const { spawn } = require( 'node:child_process' )
 
 class SongRequest {
-	constructor( expressApp, openAiClient ) {
+	constructor( expressApp, openAiClient, vtsPlugin ) {
 		this.expressApp = expressApp
 		this.openAiClient = openAiClient
+		this.vtsPlugin = vtsPlugin
 		this.songrequestId = 0
 		this.pendingSongRequests = []
 		this.isSongRequestInProcess = false
@@ -83,7 +84,11 @@ class SongRequest {
 			await this.inferSong()
 			console.log( 'Inference Done' )
 			console.log( 'Start Song' )
+			this.vtsPlugin.triggerHotkey( "BackgroundTransparent" )
+			this.vtsPlugin.triggerHotkey( "SongRequest" )
 			await this.startSong()
+			this.vtsPlugin.triggerHotkey( "BackgroundBedroom" )
+			this.vtsPlugin.triggerHotkey( "SongRequest" )
 			console.log( 'Song Done' )
 			this.openAiClient.queueReset()
 		} catch ( error ) {

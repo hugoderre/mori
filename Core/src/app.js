@@ -23,7 +23,7 @@ class App {
 		openAIClient.listenCustomPrompt()
 		openAIClient.listenTestPrompt()
 
-		const songRequest = new SongRequest( this.expressApp, openAIClient )
+		const songRequest = new SongRequest( this.expressApp, openAIClient, vtsPlugin )
 
 		const twitchEventSub = new TwitchEventSub( openAIClient, vtsPlugin, songRequest )
 		twitchEventSub.startListeners()
