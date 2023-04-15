@@ -4,6 +4,7 @@ const ffmpegPath = require( '@ffmpeg-installer/ffmpeg' ).path
 const ffmpeg = require( 'fluent-ffmpeg' )
 ffmpeg.setFfmpegPath( ffmpegPath )
 const { spawn } = require( 'node:child_process' )
+const path = require( 'path' );
 
 class SongRequest {
 	constructor( expressApp, openAiClient, vtsPlugin ) {
@@ -79,10 +80,10 @@ class SongRequest {
 		try {
 			await this.downloadSong()
 			await this.separateSong()
-			this.openAiClient.isMoriSpeaking = true
 			console.log( 'Start Inference' )
 			await this.inferSong()
 			console.log( 'Inference Done' )
+			this.openAiClient.isMoriSpeaking = true
 			console.log( 'Start Song' )
 			this.vtsPlugin.triggerHotkey( "BackgroundTransparent" )
 			this.vtsPlugin.triggerHotkey( "SongRequest" )
@@ -130,21 +131,12 @@ class SongRequest {
 
 	async inferSong() {
 		return new Promise( ( resolve, reject ) => {
-			console.log( 'chunkSeconds', this.chunkSeconds )
-			const infer = spawn( 'svc', [
-				'infer',
-				'--model-path=src/song-request/models/G_4000.pth',
-				'--config-path=src/song-request/models/config.json',
-				'--transpose=0',
-				'--no-auto-predict-f0',
-				'--f0-method=crepe',
-				`--chunk-seconds=${this.chunkSeconds}`,
-				'src/song-request/htdemucs/base_song/vocals.wav',
-			] )
+			const inferPath = path.join( __dirname, 'so-vits-svc/inference.py' );
+			const infer = spawn( 'py', [ inferPath ] );
 
-			// infer.stdout.on( 'data', ( data ) => {
-			// 	console.log( `stdout: ${data}` )
-			// } )
+			infer.stdout.on( 'data', ( data ) => {
+				console.log( `stdout: ${data}` )
+			} )
 
 			infer.stderr.on( 'data', ( data ) => {
 				console.error( `stderr: ${data}` )

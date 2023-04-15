@@ -62,6 +62,9 @@ class OpenAIClient {
 	}
 
 	async runChatCompletion( prompt ) {
+		if ( this.isMoriSpeaking ) {
+			return
+		}
 		this.isMoriSpeaking = true
 		let completionObj
 
