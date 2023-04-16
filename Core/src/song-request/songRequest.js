@@ -7,10 +7,11 @@ const { spawn } = require( 'node:child_process' )
 const path = require( 'path' );
 
 class SongRequest {
-	constructor( expressApp, openAiClient, vtsPlugin ) {
+	constructor( expressApp, openAiClient, vtsPlugin, slobs ) {
 		this.expressApp = expressApp
 		this.openAiClient = openAiClient
 		this.vtsPlugin = vtsPlugin
+		this.slobs = slobs
 		this.songrequestId = 0
 		this.pendingSongRequests = []
 		this.isSongRequestInProcess = false
@@ -80,13 +81,17 @@ class SongRequest {
 		try {
 			await this.downloadSong()
 			await this.separateSong()
+			this.slobs.setSongRequestNoticeVisibility( true )
 			console.log( 'Start Inference' )
 			await this.inferSong()
 			console.log( 'Inference Done' )
+			this.slobs.setSongRequestNoticeVisibility( false )
 			this.openAiClient.isMoriSpeaking = true
+			this.openAiClient.isSongRequestInProcess = true
 			console.log( 'Start Song' )
 			this.vtsPlugin.triggerHotkey( "BackgroundTransparent" )
 			this.vtsPlugin.triggerHotkey( "SongRequest" )
+			this.slobs.muteMic( true );
 			await this.startSong()
 			this.vtsPlugin.triggerHotkey( "BackgroundBedroom" )
 			this.vtsPlugin.triggerHotkey( "SongRequest" )
@@ -95,7 +100,10 @@ class SongRequest {
 		} catch ( error ) {
 			console.log( error )
 		}
+		this.slobs.muteMic( false );
+		this.slobs.setSongRequestNoticeVisibility( false )
 		this.openAiClient.isMoriSpeaking = false
+		this.openAiClient.isSongRequestInProcess = false
 	}
 
 	async downloadSong() {
@@ -153,7 +161,7 @@ class SongRequest {
 		return new Promise( ( resolve, reject ) => {
 			const singingProcess = spawn( 'vlc', [ '--intf', 'dummy', '--no-video', '--play-and-exit', '--aout=waveout', '--waveout-audio-device=VX238 (NVIDIA High Definition A ($1,$64)', 'src/song-request/htdemucs/base_song/full.wav' ] )
 			// const singingProcess = spawn( 'vlc', [ '--intf', 'dummy', '--no-video', '--play-and-exit', '--aout=waveout', '--waveout-audio-device=VoiceMeeter Input (VB-Audio Voi ($1,$64)', 'src/song-request/htdemucs/base_song/no_vocals.wav' ] )
-			// const singingProcess = spawn( 'vlc', [ '--intf', 'dummy', '--no-video', '--play-and-exit', '--aout=waveout', '--waveout-audio-device=Haut-parleurs (2- Focusrite USB ($1,$64)', 'src/song-request/htdemucs/base_song/no_vocals.wav' ] )
+			// const singingProcess = spawn( 'vlc', [ '--intf', 'dummy', '--no-video', '--play-and-exit', '--aout=waveout', '--waveout-audio-device=Haut-parleurs (2- Focusrite USB ($1,$64)', 'src/song-request/htdemucs/base_song/full.wav' ] )
 			spawn( 'vlc', [ '--intf', 'dummy', '--no-video', '--play-and-exit', '--aout=waveout', '--waveout-audio-device=VoiceMeeter Input (VB-Audio Voi ($1,$64)', 'src/song-request/htdemucs/base_song/vocals.out.wav' ] )
 			singingProcess.on( 'close', ( code ) => {
 				resolve( 'Singing Done' )

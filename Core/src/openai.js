@@ -47,7 +47,7 @@ class OpenAIClient {
 
 	initPromptQueue() {
 		this.promptQueueIntervalRef = setInterval( async () => {
-			if ( this.isMoriSpeaking ) {
+			if ( this.isMoriSpeaking || this.isSongRequestInProcess ) {
 				return
 			}
 			const priorities = [ 'high', 'medium', 'low' ]
@@ -62,7 +62,7 @@ class OpenAIClient {
 	}
 
 	async runChatCompletion( prompt ) {
-		if ( this.isMoriSpeaking ) {
+		if ( this.isMoriSpeaking || this.isSongRequestInProcess ) {
 			return
 		}
 		this.isMoriSpeaking = true
