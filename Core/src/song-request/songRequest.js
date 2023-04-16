@@ -12,6 +12,7 @@ class SongRequest {
 		this.openAiClient = openAiClient
 		this.vtsPlugin = vtsPlugin
 		this.slobs = slobs
+		this.songName = ''
 		this.songrequestId = 0
 		this.pendingSongRequests = []
 		this.isSongRequestInProcess = false
@@ -34,12 +35,12 @@ class SongRequest {
 	}
 
 	queueGetSongRequestNameById( songrequestId ) {
-		return this.pendingSongRequests.find( songRequest => songRequest.id === songrequestId )?.songName
+		return this.pendingSongRequests.find( songRequest => songRequest.id === songrequestId )?.songName ?? ''
 	}
 
 	listenSongRequestApproval() {
 		this.expressApp.post( '/song-request-approval', async ( req, res ) => {
-			const songName = this.queueGetSongRequestNameById( req.body.song_request_id )
+			this.songName = this.queueGetSongRequestNameById( req.body.song_request_id )
 
 			if ( this.isSongRequestInProcess ) {
 				return res.send( 'Song request is in process.' )
@@ -49,7 +50,7 @@ class SongRequest {
 				this.openAiClient.queueUpPrompt( {
 					type: 'chat_message',
 					messages: [
-						{ "role": 'user', "content": `Mori, tell the Twitch chat that you won't be able to sing for the song request "${songName}" ${req.body.reason ? `for the reason: "${req.body.reason}"` : ''}, but you are waiting for another song request!` }
+						{ "role": 'user', "content": `Mori, tell the Twitch chat that you won't be able to sing for the song request "${this.songName}" ${req.body.reason ? `for the reason: "${req.body.reason}"` : ''}, but you are waiting for another song request!` }
 					],
 					temperature: 0.9
 				},
@@ -81,27 +82,37 @@ class SongRequest {
 		try {
 			await this.downloadSong()
 			await this.separateSong()
-			this.slobs.setSongRequestNoticeVisibility( true )
+
+			this.slobs.setSongRequestInferNoticeVisibility( true )
+
 			console.log( 'Start Inference' )
 			await this.inferSong()
 			console.log( 'Inference Done' )
-			this.slobs.setSongRequestNoticeVisibility( false )
+
+			this.slobs.setSongRequestInferNoticeVisibility( false )
 			this.openAiClient.isMoriSpeaking = true
 			this.openAiClient.isSongRequestInProcess = true
-			console.log( 'Start Song' )
 			this.vtsPlugin.triggerHotkey( "BackgroundTransparent" )
 			this.vtsPlugin.triggerHotkey( "SongRequest" )
+			this.writeSongNameInFile()
+			this.slobs.setSongNameVisibility( true )
 			this.slobs.muteMic( true );
+			this.slobs.setSubtitleVisibility( false )
+
+			console.log( 'Start Song' )
 			await this.startSong()
+			console.log( 'Song Done' )
 			this.vtsPlugin.triggerHotkey( "BackgroundBedroom" )
 			this.vtsPlugin.triggerHotkey( "SongRequest" )
-			console.log( 'Song Done' )
+
 			this.openAiClient.queueReset()
 		} catch ( error ) {
 			console.log( error )
 		}
+		this.slobs.setSongNameVisibility( false )
 		this.slobs.muteMic( false );
-		this.slobs.setSongRequestNoticeVisibility( false )
+		this.slobs.setSubtitleVisibility( true )
+		this.slobs.setSongRequestInferNoticeVisibility( false )
 		this.openAiClient.isMoriSpeaking = false
 		this.openAiClient.isSongRequestInProcess = false
 	}
@@ -153,6 +164,18 @@ class SongRequest {
 
 			infer.on( 'close', ( code ) => {
 				resolve( 'Inference Done' )
+			} )
+		} )
+	}
+
+	async writeSongNameInFile() {
+		return new Promise( ( resolve, reject ) => {
+			fs.writeFile( path.join( __dirname, 'slobs_song_name.txt' ), this.songName, ( err ) => {
+				if ( err ) {
+					console.log( err )
+					reject( err )
+				}
+				resolve()
 			} )
 		} )
 	}

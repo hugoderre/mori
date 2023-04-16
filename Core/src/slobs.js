@@ -74,17 +74,38 @@ class SLOBS {
 		this.ws.send( JSON.stringify( getActiveSceneRequest ) );
 	}
 
-	setSongRequestNoticeVisibility( isVisible ) {
-		const hideSongRequestNoticeRequest = {
+	setSongRequestInferNoticeVisibility( isVisible ) {
+		this.setItemVisibility(
+			"SceneItem[\"scene_e43629ca-5841-4906-aaad-961c51a0a2dd\", \"61813109-6119-4522-851a-b89f019fe4f4\", \"text_gdiplus_e572282e-c380-4274-8a8e-4a6172bd326c\"]",
+			isVisible
+		);
+	}
+
+	setSongNameVisibility( isVisible ) {
+		this.setItemVisibility(
+			"SceneItem[\"scene_e43629ca-5841-4906-aaad-961c51a0a2dd\", \"d58402d9-27f2-4450-a5f6-ea147ceda93f\", \"text_gdiplus_811fbaea-5f31-4f21-826b-954b11c3c954\"]",
+			isVisible
+		);
+	}
+
+	setSubtitleVisibility( isVisible ) {
+		this.setItemVisibility(
+			"SceneItem[\"scene_e43629ca-5841-4906-aaad-961c51a0a2dd\", \"a160f1c4-f98e-44e9-8101-ada16d090def\", \"browser_source_f7dfc909-ca56-4573-9634-4f4953098677\"]",
+			isVisible
+		);
+	}
+
+	setItemVisibility( resource, isVisible ) {
+		const setItemVisibilityRequest = {
 			"jsonrpc": "2.0",
 			"id": 10,
 			"method": "setVisibility",
 			"params": {
-				"resource": "SceneItem[\"scene_e43629ca-5841-4906-aaad-961c51a0a2dd\", \"61813109-6119-4522-851a-b89f019fe4f4\", \"text_gdiplus_e572282e-c380-4274-8a8e-4a6172bd326c\"]",
+				"resource": resource,
 				"args": [ isVisible ]
 			}
 		};
-		this.ws.send( JSON.stringify( hideSongRequestNoticeRequest ) );
+		this.ws.send( JSON.stringify( setItemVisibilityRequest ) );
 	}
 
 }

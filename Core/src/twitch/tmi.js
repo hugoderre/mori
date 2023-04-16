@@ -29,17 +29,19 @@ class TmiApiClient {
 	async messageCallback( channel, tags, message, self ) {
 		const username = tags[ 'display-name' ]
 		const timestamp = tags[ 'tmi-sent-ts' ]
-		const fMessage = escapeSpecialChars( message )
+		let fMessage = escapeSpecialChars( message )
 
 		if ( !this.isValidChatMessage( username, fMessage ) ) {
 			return
 		}
 
+		fMessage = username + ': ' + fMessage
+
 		if ( tags[ 'custom-reward-id' ] === process.env.REWARD_ID_SONG_REQUEST ) {
 			return
 		}
 
-		const previousUserMessages = await this.messagesCollection.findMessagesByUsername( username ) ?? []
+		const previousUserMessages = await this.messagesCollection.findMessagesByUsername( 'twitch_chat_conversation' ) ?? []
 
 		const formattedPreviousUserMessages =
 			previousUserMessages && previousUserMessages.messages ?
@@ -53,7 +55,7 @@ class TmiApiClient {
 			{
 				type: 'chat_message',
 				messages: [
-					{ "role": 'user', "content": `Mori, the next messages are a conversation with the viewer "${username}". For all the messages, answer either in a weird, sarcastic or cute way, like UwU. You like manga, video games, and doing live broadcasts on Twitch. ALWAYS keep this personality in mind.` },
+					{ "role": 'user', "content": `Mori, the next messages are the Twitch chat conversation. Each message is preceded by the username of the viewer (Username: Message). For all the messages, answer briefly either in a weird, sarcastic or cute way, like UwU. You love to answer in a strange or sometimes provocative or teasing way. ALWAYS keep this personality in mind.` },
 					...formattedPreviousUserMessages,
 					{ "role": 'user', "content": fMessage }
 				],
@@ -70,9 +72,9 @@ class TmiApiClient {
 				response: data.completion,
 			}
 			await this.messagesCollection.pushViewerMessageUpsert(
-				username,
+				'twitch_chat_conversation',
 				newMessage,
-				4
+				6
 			)
 		} )
 	}
@@ -160,8 +162,8 @@ class TmiApiClient {
 			return
 		}
 
-		const usernameDenies = [ 'Moobot', 'WizeBot' ]
-		// const usernameDenies = [ 'Moobot', 'WizeBot', 'Mori_IA' ]
+		// const usernameDenies = [ 'Moobot', 'WizeBot' ]
+		const usernameDenies = [ 'Moobot', 'WizeBot', 'Mori_IA' ]
 
 		if ( usernameDenies.some( u => username.includes( u ) ) ) {
 			return
