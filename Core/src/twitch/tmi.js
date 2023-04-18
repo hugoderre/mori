@@ -8,6 +8,7 @@ class TmiApiClient {
 		this.expressApp = expressApp
 		this.openAIClient = openAIClient
 		this.messagesCollection = messagesCollection
+		this.startListeners()
 	}
 
 	startListeners() {
@@ -55,7 +56,7 @@ class TmiApiClient {
 			{
 				type: 'chat_message',
 				messages: [
-					{ "role": 'user', "content": `Mori, the next messages are the Twitch chat conversation. Each message is preceded by the username of the viewer (Username: Message). For all the messages, answer briefly either in a weird, sarcastic or cute way, like UwU. You love to answer in a strange or sometimes provocative or teasing way. ALWAYS keep this personality in mind.` },
+					{ "role": 'user', "content": `Mori, the next messages are the Twitch chat conversation. Each message is preceded by the username of the viewer (Username: Message). For all the messages, answer briefly either in a evil and weird and cute way (say "UwU" only when it's appropriate and completion is cute!). You love to answer in a strange or sometimes provocative or teasing way. ALWAYS keep this personality in mind.` },
 					...formattedPreviousUserMessages,
 					{ "role": 'user', "content": fMessage }
 				],

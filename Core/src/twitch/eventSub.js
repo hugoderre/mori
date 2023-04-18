@@ -12,6 +12,7 @@ class TwitchEventSub {
 		this.clientSecret = process.env.TWITCH_CLIENT_SECRET
 		this.userId = process.env.TWITCH_USER_ID
 		this.pubSubClient = this.getPubSubClient()
+		this.startListeners()
 	}
 
 	async getPubSubClient() {

@@ -23,6 +23,9 @@ class OpenAIClient {
 		this.isMoriSpeaking = false
 		this.isSongRequestInProcess = false
 		this.initPromptQueue()
+		this.listenRLBotPrompt()
+		this.listenCustomPrompt()
+		this.listenTestPrompt()
 	}
 
 	getApi() {
@@ -199,10 +202,25 @@ class OpenAIClient {
 					messages: req.body.messages,
 					temperature: req.body.temperature ?? 1,
 					max_tokens: req.body.max_tokens ?? 200,
-					username: req.body.username ?? ''
+					username: req.body.username ?? '',
+					system_context: 'This next prompt is a custom prompt from your creator. Speak as if your completion came from your free will, without saying that it comes from your creator.',
 				},
 				'high'
 			)
+
+			this.expressApp.once( 'completion_completed', async ( data ) => {
+				console.log( 'Send to DB' )
+				const newMessage = {
+					timestamp: Date.now(),
+					message: req.body.messages[ 0 ].content,
+					response: data.completion,
+				}
+				await this.messagesCollection.pushViewerMessageUpsert(
+					'twitch_chat_conversation',
+					newMessage,
+					6
+				)
+			} )
 
 			return res.send( 'Custom prompt done' )
 		} )
@@ -227,7 +245,7 @@ class OpenAIClient {
 			this.queueUpPrompt(
 				{
 					messages: [
-						{ "role": 'user', "content": `Mori, the next messages are the Twitch chat conversation. Each message is preceded by the username of the viewer (Username: Message). For all the messages, answer briefly either in a diabolic, or weird or sometime cute way. You love to answer in a strange or sometimes provocative or teasing way. ALWAYS keep this personality in mind.` },
+						{ "role": 'user', "content": `Mori, the next messages are the Twitch chat conversation. Each message is preceded by the username of the viewer (Username: Message). For all the messages, answer briefly either in a evil and weird and cute way (say "UwU" only when it's appropriate and completion is cute!). You love to answer in a strange or sometimes provocative or teasing way. ALWAYS keep this personality in mind.` },
 						...formattedPreviousUserMessages,
 						...req.body.messages
 					],

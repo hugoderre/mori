@@ -5,6 +5,7 @@ dotenv.config()
 class StreamlabsApiClient {
 	constructor( OpenAIClient ) {
 		this.OpenAIClient = OpenAIClient
+		this.startListeners()
 	}
 
 	async startListeners() {

@@ -183,9 +183,9 @@ class SongRequest {
 	async startSong() {
 		return new Promise( ( resolve, reject ) => {
 			const singingProcess = spawn( 'vlc', [ '--intf', 'dummy', '--no-video', '--play-and-exit', '--aout=waveout', '--waveout-audio-device=VX238 (NVIDIA High Definition A ($1,$64)', 'src/song-request/htdemucs/base_song/full.wav' ] )
+			spawn( 'vlc', [ '--intf', 'dummy', '--no-video', '--play-and-exit', '--aout=waveout', '--waveout-volume=1', '--waveout-audio-device=VoiceMeeter Input (VB-Audio Voi ($1,$64)', 'src/song-request/htdemucs/base_song/vocals.out.wav' ] )
 			// const singingProcess = spawn( 'vlc', [ '--intf', 'dummy', '--no-video', '--play-and-exit', '--aout=waveout', '--waveout-audio-device=VoiceMeeter Input (VB-Audio Voi ($1,$64)', 'src/song-request/htdemucs/base_song/no_vocals.wav' ] )
-			// const singingProcess = spawn( 'vlc', [ '--intf', 'dummy', '--no-video', '--play-and-exit', '--aout=waveout', '--waveout-audio-device=Haut-parleurs (2- Focusrite USB ($1,$64)', 'src/song-request/htdemucs/base_song/full.wav' ] )
-			spawn( 'vlc', [ '--intf', 'dummy', '--no-video', '--play-and-exit', '--aout=waveout', '--waveout-audio-device=VoiceMeeter Input (VB-Audio Voi ($1,$64)', 'src/song-request/htdemucs/base_song/vocals.out.wav' ] )
+			// const singingProcess = spawn( 'vlc', [ '--intf', 'dummy', '--no-video', '--play-and-exit', '--aout=waveout', '--waveout-volume=1', '--waveout-audio-device=Haut-parleurs (2- Focusrite USB ($1,$64)', 'src/song-request/htdemucs/base_song/full.wav' ] )
 			singingProcess.on( 'close', ( code ) => {
 				resolve( 'Singing Done' )
 			} )

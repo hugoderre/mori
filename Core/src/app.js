@@ -22,22 +22,14 @@ class App {
 		await messagesCollection.initClient()
 
 		const openAIClient = new OpenAIClient( this.expressApp, messagesCollection, vtsPlugin )
-		openAIClient.listenRLBotPrompt()
-		openAIClient.listenCustomPrompt()
-		openAIClient.listenTestPrompt()
 
 		const songRequest = new SongRequest( this.expressApp, openAIClient, vtsPlugin, slobs )
 
 		const twitchEventSub = new TwitchEventSub( openAIClient, vtsPlugin, songRequest )
-		twitchEventSub.startListeners()
 
 		const tmi = new TmiApiClient( this.expressApp, openAIClient, messagesCollection )
-		tmi.startListeners()
 
 		const streamlabs = new StreamlabsApiClient( openAIClient )
-		streamlabs.startListeners()
-
-
 	}
 }
 
