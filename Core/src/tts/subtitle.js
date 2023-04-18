@@ -116,7 +116,7 @@ class SubTitle {
 							fontSize -= 0.1;
 							textContainer.style.fontSize = fontSize + 'px';
 						}
-					}, 200 );
+					}, 350 );
 				} );
 			</script>
 		</body>
