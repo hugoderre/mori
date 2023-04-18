@@ -37,13 +37,14 @@ class TwitchEventSub {
 
 	async queueUpOnRedemption() {
 		( await this.pubSubClient ).onRedemption( this.userId, ( data ) => {
+			const username = data.userDisplayName == 'Mori_IA' ? 'Creator' : data.userDisplayName
 			switch ( data.rewardId ) {
 				case process.env.REWARD_ID_DRINK:
 					this.openAiClient.queueUpPrompt( {
 						type: 'vtsItemTrigger',
 						vtsHotkeyName: 'Drink',
 						messages: [
-							{ "role": 'user', "content": `Mori, the viewer "${data.userDisplayName}" just gave you a drink to hydrate you. Thank him sarcastically.` }
+							{ "role": 'user', "content": `Mori, the viewer "${username}" just gave you a drink to hydrate you. Thank him sarcastically.` }
 						],
 						temperature: 0.9
 					},
@@ -55,7 +56,7 @@ class TwitchEventSub {
 						type: 'vtsItemTrigger',
 						vtsHotkeyName: 'Pet the Mori',
 						messages: [
-							{ "role": 'user', "content": `Mori, the viewer "${data.userDisplayName}" just patted your head virtually. Thank him in an amused and sarcastic way.` }
+							{ "role": 'user', "content": `Mori, the viewer "${username}" just patted your head virtually. Thank him in an amused and sarcastic way.` }
 						],
 						temperature: 0.9
 					},
@@ -67,7 +68,7 @@ class TwitchEventSub {
 						type: 'vtsItemTrigger',
 						vtsHotkeyName: 'Sunglasses',
 						messages: [
-							{ "role": 'user', "content": `Mori, the "${data.userDisplayName}" viewer just put sunglasses on you. Thank him in an amused and sarcastic way.` }
+							{ "role": 'user', "content": `Mori, the "${username}" viewer just put sunglasses on you. Thank him in an amused and sarcastic way.` }
 						],
 						temperature: 0.9
 					},
@@ -79,7 +80,7 @@ class TwitchEventSub {
 						type: 'vtsItemTrigger',
 						vtsHotkeyName: 'Hammer',
 						messages: [
-							{ "role": 'user', "content": `Mori, the "${data.userDisplayName}" viewer just hit you with a virtual hammer. React to this in an amused and sarcastic way.` }
+							{ "role": 'user', "content": `Mori, the "${username}" viewer just hit you with a virtual hammer. React to this in an amused and sarcastic way.` }
 						],
 						temperature: 0.9
 					},
@@ -111,7 +112,7 @@ class TwitchEventSub {
 					this.openAiClient.queueUpPrompt( {
 						type: 'chat_message',
 						messages: [
-							{ "role": 'user', "content": `Mori, the "${data.userDisplayName}" viewer has just made a song request for the youtube music "${data.message}". Tell him you are learning the music right now and will play it in 5 minutes!` }
+							{ "role": 'user', "content": `Mori, the viewer "${username}" has just made a song request for the youtube music "${data.message}". Tell him you are learning the music right now and will play it in 5 minutes!` }
 						],
 						temperature: 0.9
 					},
@@ -123,7 +124,7 @@ class TwitchEventSub {
 					this.openAiClient.queueUpPrompt( {
 						type: 'chat_message',
 						messages: [
-							{ "role": 'user', "content": `Mori, the "${data.userDisplayName}" viewer has just made a painting request with the theme "${data.message}". Tell him briefly that you are drawing and that will be displayed on the screen if it looks good!` }
+							{ "role": 'user', "content": `Mori, the viewer "${username}" has just made a painting request with the theme "${data.message}". Tell him briefly that you are drawing and that will be displayed on the screen if it looks good!` }
 						],
 						temperature: 0.9,
 						callback: () => {

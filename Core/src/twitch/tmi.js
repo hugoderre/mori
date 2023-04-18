@@ -28,7 +28,10 @@ class TmiApiClient {
 	}
 
 	async messageCallback( channel, tags, message, self ) {
-		const username = tags[ 'display-name' ]
+		let username = tags[ 'display-name' ]
+
+		username = username === 'Mori_IA' ? 'Creator' : username
+
 		const timestamp = tags[ 'tmi-sent-ts' ]
 		let fMessage = escapeSpecialChars( message )
 
