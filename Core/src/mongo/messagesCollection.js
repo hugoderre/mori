@@ -1,10 +1,10 @@
 const MongoCrud = require( './mongoCrud' )
 
 class MessagesCollection extends MongoCrud {
-	async pushViewerMessageUpsert( username, newMessage, limit ) {
+	async pushMessageUpsert( group, newMessage, limit ) {
 		await this.upsertDocument(
 			'messages',
-			{ username: username },
+			{ group: group },
 			{
 				$push: {
 					messages: {
@@ -13,18 +13,22 @@ class MessagesCollection extends MongoCrud {
 					}
 				},
 				$setOnInsert: {
-					username: username,
+					group: group,
 				},
 			}
 		)
 	}
 
-	async findMessagesByUsername( username ) {
-		return await this.findDocument( 'messages', { username } )
+	async findMessagesByGroup( group ) {
+		return await this.findDocument( 'messages', { group } )
 	}
 
 	async findAllMessages() {
 		return await this.findAllDocuments( 'messages' )
+	}
+
+	async deleteAllMessages() {
+		await this.client.db( process.env.MONGODB_DBNAME ).collection( 'messages' ).deleteMany( {} )
 	}
 }
 

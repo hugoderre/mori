@@ -42,7 +42,7 @@ class TmiApiClient {
 			return
 		}
 
-		const previousUserMessages = await this.messagesCollection.findMessagesByUsername( 'twitch_chat_conversation' ) ?? []
+		const previousUserMessages = await this.messagesCollection.findMessagesByGroup( 'twitch_chat_conversation' ) ?? []
 
 		const formattedPreviousUserMessages =
 			previousUserMessages && previousUserMessages.messages ?
@@ -72,7 +72,7 @@ class TmiApiClient {
 				message: fMessage,
 				response: data.completion,
 			}
-			await this.messagesCollection.pushViewerMessageUpsert(
+			await this.messagesCollection.pushMessageUpsert(
 				'twitch_chat_conversation',
 				newMessage,
 				6

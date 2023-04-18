@@ -1,5 +1,6 @@
 const MessagesCollection = require( './mongo/messagesCollection.js' )
-const OpenAIClient = require( './openai.js' )
+const OpenAIClient = require( './openai/client.js' )
+const OpenAIExpressRoutes = require( './openai/expressRoutes.js' )
 const TwitchEventSub = require( './twitch/eventSub.js' )
 const StreamlabsApiClient = require( './twitch/streamlabs.js' )
 const TmiApiClient = require( './twitch/tmi.js' )
@@ -22,6 +23,8 @@ class App {
 		await messagesCollection.initClient()
 
 		const openAIClient = new OpenAIClient( this.expressApp, messagesCollection, vtsPlugin )
+
+		const openAIExpressRoutes = new OpenAIExpressRoutes( this.expressApp, openAIClient, messagesCollection )
 
 		const songRequest = new SongRequest( this.expressApp, openAIClient, vtsPlugin, slobs )
 
