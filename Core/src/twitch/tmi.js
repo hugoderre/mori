@@ -38,7 +38,7 @@ class TmiApiClient {
 
 		fMessage = username + ': ' + fMessage
 
-		if ( tags[ 'custom-reward-id' ] === process.env.REWARD_ID_SONG_REQUEST ) {
+		if ( tags[ 'custom-reward-id' ] === process.env.REWARD_ID_SONG_REQUEST || tags[ 'custom-reward-id' ] === process.env.REWARD_ID_PAINT_REQUEST ) {
 			return
 		}
 
@@ -163,8 +163,8 @@ class TmiApiClient {
 			return
 		}
 
-		// const usernameDenies = [ 'Moobot', 'WizeBot' ]
-		const usernameDenies = [ 'Moobot', 'WizeBot', 'Mori_IA' ]
+		const usernameDenies = [ 'Moobot', 'WizeBot' ]
+		// const usernameDenies = [ 'Moobot', 'WizeBot', 'Mori_IA' ]
 
 		if ( usernameDenies.some( u => username.includes( u ) ) ) {
 			return

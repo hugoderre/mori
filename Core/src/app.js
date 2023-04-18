@@ -22,7 +22,7 @@ class App {
 		const messagesCollection = new MessagesCollection()
 		await messagesCollection.initClient()
 
-		const openAIClient = new OpenAIClient( this.expressApp, messagesCollection, vtsPlugin )
+		const openAIClient = new OpenAIClient( this.expressApp, messagesCollection, vtsPlugin, slobs )
 
 		const openAIExpressRoutes = new OpenAIExpressRoutes( this.expressApp, openAIClient, messagesCollection )
 

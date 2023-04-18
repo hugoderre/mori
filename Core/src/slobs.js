@@ -95,6 +95,28 @@ class SLOBS {
 		);
 	}
 
+	setChevaletVisibility( isVisible ) {
+		this.setItemVisibility(
+			"SceneItem[\"scene_e43629ca-5841-4906-aaad-961c51a0a2dd\", \"c0cf5d57-8eb2-402a-b4f9-4722cd9c03b8\", \"image_source_f6827531-bd37-46fe-b1d3-46919c0c0866\"]",
+			isVisible
+		);
+	}
+
+	setPaintingCompletedVisibility( isVisible ) {
+		this.setItemVisibility(
+			"SceneItem[\"scene_e43629ca-5841-4906-aaad-961c51a0a2dd\", \"345b717d-6155-446d-b556-f179f8366055\", \"image_source_86bdf888-2864-4446-b06c-c232ff2d3a17\"]",
+			isVisible
+		);
+		this.setItemVisibility(
+			"SceneItem[\"scene_e43629ca-5841-4906-aaad-961c51a0a2dd\", \"bdd196a6-bf54-477f-a358-50f5c4126712\", \"image_source_d0dd37ec-d7a6-436e-b0f3-cd5cb115105f\"]",
+			isVisible
+		);
+		this.setItemVisibility(
+			"SceneItem[\"scene_e43629ca-5841-4906-aaad-961c51a0a2dd\", \"77a0260d-0238-4fd4-a7c5-a7e8cc92fc70\", \"image_source_7147b62e-ca43-4fee-92d9-5da678364a7e\"]",
+			isVisible
+		);
+	}
+
 	setItemVisibility( resource, isVisible ) {
 		const setItemVisibilityRequest = {
 			"jsonrpc": "2.0",
@@ -107,7 +129,6 @@ class SLOBS {
 		};
 		this.ws.send( JSON.stringify( setItemVisibilityRequest ) );
 	}
-
 }
 
 module.exports = SLOBS;

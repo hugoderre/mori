@@ -119,6 +119,20 @@ class TwitchEventSub {
 					)
 					this.songRequest.queueUpSongRequest( data.message )
 					break
+				case process.env.REWARD_ID_PAINT_REQUEST:
+					this.openAiClient.queueUpPrompt( {
+						type: 'chat_message',
+						messages: [
+							{ "role": 'user', "content": `Mori, the "${data.userDisplayName}" viewer has just made a painting request with the theme "${data.message}". Tell him briefly that you are drawing and that will be displayed on the screen if it looks good!` }
+						],
+						temperature: 0.9,
+						callback: () => {
+							this.openAiClient.runImageCompletion( data.message )
+						}
+					},
+						'high'
+					)
+					break
 				default:
 					break
 			}

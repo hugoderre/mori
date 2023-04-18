@@ -105,7 +105,7 @@ class SongRequest {
 			this.vtsPlugin.triggerHotkey( "BackgroundBedroom" )
 			this.vtsPlugin.triggerHotkey( "SongRequest" )
 
-			this.openAiClient.queueReset()
+			this.openAiClient.softQueueReset()
 		} catch ( error ) {
 			console.log( error )
 		}
