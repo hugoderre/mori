@@ -79,7 +79,7 @@ class OpenAIClient {
 		}
 
 		try {
-			completionObj = await this.requestApiWithRetryAndTimeout( 3, 1000, 11000, this.chatCompletionRequest.bind( this ), prompt );
+			completionObj = await this.requestApiWithRetryAndTimeout( 3, 1000, 20000, this.chatCompletionRequest.bind( this ), prompt );
 		} catch ( error ) {
 			this.isMoriSpeaking = false
 			console.error( "Erreur lors de la création de la completion :", error );
@@ -108,6 +108,9 @@ class OpenAIClient {
 		}
 
 		this.voiceMakerAPI.runTTS( completion )
+			.then( () => {
+				this.chatCompletionTriggerVTSHotkeyOnKeyword( completion )
+			} )
 			.catch( ( error ) => {
 				console.error( 'Erreur lors du traitement Text-to-Speech : ', error )
 				this.isMoriSpeaking = false
@@ -152,6 +155,18 @@ class OpenAIClient {
 			.replace( 'Mori :', '' )
 			.replace( ';)', '' )
 		return fCompletion
+	}
+
+	chatCompletionTriggerVTSHotkeyOnKeyword( completion ) {
+		const keywords = [
+			'winks',
+			'giggles'
+		]
+		for ( const keyword of keywords ) {
+			if ( completion.toLowerCase().includes( keyword ) ) {
+				this.vtsPlugin.triggerHotkey( keyword )
+			}
+		}
 	}
 
 	async runImageCompletion( prompt ) {
@@ -205,7 +220,7 @@ class OpenAIClient {
 
 	imageCompletionRequest( prompt ) {
 		const completionPromise = this.api.createImage( {
-			prompt,
+			"prompt": prompt + ', digital art',
 			"n": 1,
 			"size": "256x256",
 			"response_format": "url"
