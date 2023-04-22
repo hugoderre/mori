@@ -34,7 +34,7 @@ config_path = os.path.join(parent_dir, "models\\config.json")
 
 # num_parts = 8
 overlap_seconds = 0.125
-seconds_per_part = 8
+seconds_per_part = 5
 
 def main():
     timestamp = datetime.now()
