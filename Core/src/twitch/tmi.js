@@ -55,11 +55,22 @@ class TmiApiClient {
 				] ).flat()
 				: []
 
+
+		const personalityRandomizer = Math.random()
+
+		let personality
+
+		if ( personalityRandomizer < 0.5 ) {
+			personality = `For all the messages, answer briefly in an sarcastic way. You like to tease people.`
+		} else {
+			personality = `For all the messages, answer briefly in a cute way (say "UwU" only when it's appropriate and completion is cute!).`
+		}
+
 		this.openAIClient.queueUpPrompt(
 			{
 				type: 'chat_message',
 				messages: [
-					{ "role": 'user', "content": `Mori, the next messages are the Twitch chat conversation. Each message is preceded by the username of the viewer (Username: Message). For all the messages, answer briefly either in a evil and weird and cute way (say "UwU" only when it's appropriate and completion is cute!). You love to answer in a strange or sometimes provocative or teasing way. ALWAYS keep this personality in mind.` },
+					{ "role": 'user', "content": `Mori, the next messages are the Twitch chat conversation. Each message is preceded by the username of the viewer (Username: Message). ${personality}. ALWAYS keep this personality in mind.` },
 					...formattedPreviousUserMessages,
 					{ "role": 'user', "content": fMessage }
 				],
