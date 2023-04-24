@@ -12,13 +12,10 @@ class SubTitle {
 	}
 
 	async initServer() {
-		const filePath = 'src/tts/tts-subtitle.html'
-		const html = this.generateSubtitleHTML()
-
-		fs.writeFileSync( filePath, html, 'utf8' )
-
 		return new Promise( ( resolve ) => {
 			this.expressApp.get( '/', ( req, res ) => {
+				const filePath = 'templates/subtitle.html'
+				const html = fs.readFileSync( filePath, 'utf8' )
 				res.status( 200 ).send( html )
 			} )
 
@@ -38,90 +35,6 @@ class SubTitle {
 				resolve()
 			} )
 		} )
-	}
-
-	generateSubtitleHTML() {
-		return `
-		<html>
-		<head>
-			<meta charset="UTF-8">
-			<link rel="preconnect" href="https://fonts.googleapis.com">
-			<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-			<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap" rel="stylesheet"> 
-			<style>
-				body {
-					margin: 0;
-					padding: 0;
-					background-color: transparent;
-					font-family: 'Kalam', cursive;
-					font-weight: 700;
-				}
-
-				#main-container {
-					width: 98%;
-					height: 500px;
-					display: flex;
-					justify-content: center;
-					align-items: center;
-				}
-
-				#text-container {
-					width: fit-content;
-					text-align: center;
-					display: inline-block;
-					-webkit-text-stroke: 2px black;
-					text-stroke: 2px black;
-					color: white;
-					text-shadow: 1px 1px black;
-					line-height: 1.2;
-				}
-			</style>
-		</head>
-		<body>
-			<div id="main-container" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
-				<div id="text-container"></div>
-			</div>
-			<script>
-				const socket = new WebSocket( 'ws://localhost:${this.port}/ws' );
-		
-				const mainContainer = document.querySelector( '#main-container' );
-				const textContainer = document.querySelector( '#text-container' );
-		
-				socket.addEventListener( 'message', ( event ) => {
-					textContainer.innerHTML = '';
-					const message = event.data;
-					const words = message.split( ' ' );
-		
-					let currentIndex = 0;
-					let fontSize = 52;
-					textContainer.style.fontSize = fontSize + 'px';
-					const interval = setInterval( () => {
-						if ( currentIndex >= words.length ) {
-							clearInterval( interval );
-							socket.send( 'completed' );
-							return;
-						}
-		
-						const word = words[ currentIndex ];
-						const textNode = document.createTextNode( word + ' ' );
-						textContainer.appendChild( textNode );
-		
-						currentIndex++;
-
-						console.log( 'mainContainerWidth', mainContainer.clientWidth)
-						console.log( 'textContainerWidth', textContainer.clientWidth)
-
-						if ( textContainer.clientWidth === mainContainer.clientWidth && fontSize > 22 ) {
-							console.log('decrease font size')
-							fontSize -= 0.1;
-							textContainer.style.fontSize = fontSize + 'px';
-						}
-					}, 350 );
-				} );
-			</script>
-		</body>
-		</html>
-    `
 	}
 
 	async send( message ) {
