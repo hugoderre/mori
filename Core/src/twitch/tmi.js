@@ -1,5 +1,6 @@
 const tmi = require( 'tmi.js' )
 const { escapeSpecialChars } = require( './../utils.js' )
+const OpenAIClient = require( './../openai/client.js' )
 const dotenv = require( 'dotenv' )
 dotenv.config()
 
@@ -46,15 +47,7 @@ class TmiApiClient {
 		}
 
 		const previousUserMessages = await this.messagesCollection.findMessagesByGroup( 'twitch_chat_conversation' ) ?? []
-
-		const formattedPreviousUserMessages =
-			previousUserMessages && previousUserMessages.messages ?
-				previousUserMessages.messages.map( ( msg ) => [
-					{ "role": "user", "content": msg.message },
-					{ "role": "assistant", "content": msg.response },
-				] ).flat()
-				: []
-
+		const formattedPreviousUserMessages = OpenAIClient.getFormattedPreviousUserMessages( previousUserMessages )
 
 		const personalityRandomizer = Math.random()
 

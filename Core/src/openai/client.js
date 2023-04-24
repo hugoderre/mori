@@ -92,7 +92,7 @@ class OpenAIClient {
 
 		let completion;
 		try {
-			completion = this.chatCompletionFormatting( escapeSpecialChars( completionObj.data.choices[ 0 ].message.content ) )
+			completion = OpenAIClient.chatCompletionFormatting( escapeSpecialChars( completionObj.data.choices[ 0 ].message.content ) )
 		} catch ( error ) {
 			this.isMoriSpeaking = false
 			console.error( "Erreur lors du formatage de la completion :", error );
@@ -148,13 +148,6 @@ class OpenAIClient {
 		} );
 
 		return completionPromise
-	}
-
-	chatCompletionFormatting( completion ) {
-		let fCompletion = completion.replace( 'Mori:', '' )
-			.replace( 'Mori :', '' )
-			.replace( ';)', '' )
-		return fCompletion
 	}
 
 	chatCompletionTriggerVTSHotkeyOnKeyword( completion ) {
@@ -252,6 +245,22 @@ class OpenAIClient {
 		}
 
 		throw new Error( "Nombre maximal de tentatives atteint. Échec de la requête." );
+	}
+
+	static chatCompletionFormatting( completion ) {
+		let fCompletion = completion.replace( 'Mori:', '' )
+			.replace( 'Mori :', '' )
+			.replace( ';)', '' )
+		return fCompletion
+	}
+
+	static getFormattedPreviousUserMessages( previousUserMessages ) {
+		return previousUserMessages && previousUserMessages.messages ?
+			previousUserMessages.messages.map( ( msg ) => [
+				{ "role": "user", "content": msg.message },
+				{ "role": "assistant", "content": msg.response },
+			] ).flat()
+			: []
 	}
 }
 

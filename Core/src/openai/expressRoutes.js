@@ -1,3 +1,5 @@
+const OpenAIClient = require( './../openai/client.js' )
+
 class OpenAIExpressRoutes {
 	constructor( expressApp, openAIClient, messagesCollection ) {
 		this.openAIClient = openAIClient
@@ -49,14 +51,7 @@ class OpenAIExpressRoutes {
 			}
 
 			const previousUserMessages = await this.messagesCollection.findMessagesByGroup( 'twitch_chat_conversation' ) ?? []
-
-			const formattedPreviousUserMessages =
-				previousUserMessages && previousUserMessages.messages ?
-					previousUserMessages.messages.map( ( msg ) => [
-						{ "role": "user", "content": msg.message },
-						{ "role": "assistant", "content": msg.response },
-					] ).flat()
-					: []
+			const formattedPreviousUserMessages = OpenAIClient.getFormattedPreviousUserMessages( previousUserMessages )
 
 			this.openAIClient.queueUpPrompt(
 				{
