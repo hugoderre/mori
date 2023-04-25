@@ -95,13 +95,13 @@ class OpenAIExpressRoutes {
 				} );
 			}
 
-			const previousUserMessages = await this.messagesCollection.findMessagesByGroup( `discord_chat_user_${req.body.username}` ) ?? []
-			const formattedPreviousUserMessages = OpenAIClient.getFormattedPreviousUserMessages( previousUserMessages )
 			const username = req.body.username === 'Mori' ? 'Creator' : req.body.username
+			const previousUserMessages = await this.messagesCollection.findMessagesByGroup( `discord_chat_user_${username}` ) ?? []
+			const formattedPreviousUserMessages = OpenAIClient.getFormattedPreviousUserMessages( previousUserMessages )
 
 			const prompt = {
 				messages: [
-					{ "role": 'user', "content": `Mori, the next messages are the Discord chat conversation with the viewer ${username}. For all the messages, answer briefly either in a evil and weird and cute way (only say "UwU" when it's appropriate and your answer is cute!). You love to answer in a strange or sometimes provocative or teasing way. ALWAYS keep this personality in mind.` },
+					{ "role": 'user', "content": `Mori, the next messages are the Discord chat conversation with the viewer ${username}. For all the messages, answer briefly either in a evil and weird and cute way (with cute emotes for example). You love to answer in a strange or sometimes provocative or teasing way. ALWAYS keep this personality in mind.` },
 					...formattedPreviousUserMessages,
 					...req.body.messages
 				],
@@ -133,7 +133,7 @@ class OpenAIExpressRoutes {
 				response: completion,
 			}
 			await this.messagesCollection.pushMessageUpsert(
-				`discord_chat_user_${username}}`,
+				`discord_chat_user_${username}`,
 				newMessage,
 				4
 			)
