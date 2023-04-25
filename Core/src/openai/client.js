@@ -72,14 +72,15 @@ class OpenAIClient {
 			return
 		}
 		this.isMoriSpeaking = true
-		let completionObj
 
 		if ( prompt.type === 'chat_message' ) {
 			this.vtsPlugin.triggerHotkey( "Look Chat" )
 		}
 
+		let completion
+
 		try {
-			completionObj = await this.requestApiWithRetryAndTimeout( 3, 1000, 20000, this.chatCompletionRequest.bind( this ), prompt );
+			completion = await this.requestApiWithRetryAndTimeout( 3, 1000, 20000, this.chatCompletionRequest.bind( this ), prompt );
 		} catch ( error ) {
 			this.isMoriSpeaking = false
 			console.error( "Erreur lors de la création de la completion :", error );
@@ -88,15 +89,6 @@ class OpenAIClient {
 
 		if ( prompt.type === 'vtsItemTrigger' ) {
 			this.vtsPlugin.triggerHotkey( prompt.vtsHotkeyName )
-		}
-
-		let completion;
-		try {
-			completion = OpenAIClient.chatCompletionFormatting( escapeSpecialChars( completionObj.data.choices[ 0 ].message.content ) )
-		} catch ( error ) {
-			this.isMoriSpeaking = false
-			console.error( "Erreur lors du formatage de la completion :", error );
-			return
 		}
 
 		console.log( 'Completion received and formatted : ', completion )
@@ -129,7 +121,6 @@ class OpenAIClient {
 
 	chatCompletionRequest( prompt ) {
 		const completionSystemContext = prompt.system_context ?? "Currently you are answering questions on your Twitch chat and awaiting for song request.";
-		// const completionSystemContext = prompt.system_context ?? "Currently you are training for Rocket League and answering questions on your Twitch chat.";
 		const completionPromise = this.api.createChatCompletion( {
 			model: process.env.OPENAI_CHAT_MODEL,
 			messages: [
@@ -232,7 +223,9 @@ class OpenAIClient {
 					new Promise( ( _, reject ) => setTimeout( () => reject( new Error( 'Timeout Completion' ) ), timeout ) ),
 				] );
 
-				return completionObj;
+				const formattedCompletion = OpenAIClient.chatCompletionFormatting( escapeSpecialChars( completionObj.data.choices[ 0 ].message.content ) )
+
+				return formattedCompletion
 			} catch ( error ) {
 				console.error( `Erreur lors de la tentative ${attempt}:`, error );
 

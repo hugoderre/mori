@@ -34,6 +34,15 @@ class App {
 
 		const streamlabs = new StreamlabsApiClient( openAIClient )
 	}
+
+	async discordBotStandalone() {
+		const messagesCollection = new MessagesCollection()
+		await messagesCollection.initClient()
+
+		const openAIClient = new OpenAIClient( this.expressApp, messagesCollection )
+
+		const openAIExpressRoutes = new OpenAIExpressRoutes( this.expressApp, openAIClient, messagesCollection )
+	}
 }
 
 module.exports = App

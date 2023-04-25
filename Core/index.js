@@ -7,4 +7,9 @@ expressApp.listen( 3000, () => console.log( 'Listen 3000' ) )
 expressApp.use( bodyParser.json() );
 
 const app = new App( expressApp )
-app.init()
+
+if ( process.argv.includes( '-d' ) ) {
+	app.discordBotStandalone()
+} else {
+	app.init()
+}
