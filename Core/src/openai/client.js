@@ -3,6 +3,7 @@ require( 'dotenv' ).config()
 const { Configuration, OpenAIApi } = require( 'openai' )
 const VoiceMakerAPI = require( '../tts/voicemaker.js' )
 const CompletionLogger = require( '../logger.js' )
+const DiscordBot = require( '../discord/bot.js' )
 const { sha256 } = require( 'js-sha256' )
 const { escapeSpecialChars, downloadImageFromUrl } = require( '../utils.js' )
 
@@ -77,15 +78,17 @@ class OpenAIClient {
 			this.vtsPlugin.triggerHotkey( "Look Chat" )
 		}
 
-		let completion
+		let completionObj
 
 		try {
-			completion = await this.requestApiWithRetryAndTimeout( 3, 1000, 20000, this.chatCompletionRequest.bind( this ), prompt );
+			completionObj = await this.requestApiWithRetryAndTimeout( 3, 1000, 20000, this.chatCompletionRequest.bind( this ), prompt );
 		} catch ( error ) {
 			this.isMoriSpeaking = false
 			console.error( "Erreur lors de la création de la completion :", error );
 			return
 		}
+
+		const completion = OpenAIClient.chatCompletionFormatting( escapeSpecialChars( completionObj.data.choices[ 0 ].message.content ) )
 
 		if ( prompt.type === 'vtsItemTrigger' ) {
 			this.vtsPlugin.triggerHotkey( prompt.vtsHotkeyName )
@@ -172,12 +175,13 @@ class OpenAIClient {
 		}
 
 		// Create image file from imageUrl in /assets/slobs folder
+		const imagePath = './assets/slobs/painting.jpg'
 		if ( !fs.existsSync( './assets/slobs/' ) ) {
 			fs.mkdirSync( './assets/slobs/' )
 		}
-		await downloadImageFromUrl( imageUrl, './assets/slobs/painting.jpg' )
+		await downloadImageFromUrl( imageUrl, imagePath )
 
-		console.log( 'Image received and formatted : ', imageUrl )
+		DiscordBot.sendFileImageToChannel( 'post_image', imagePath, prompt )
 
 		this.vtsPlugin.triggerHotkey( "Painting" )
 		this.slobs.setChevaletVisibility( true )
@@ -223,9 +227,7 @@ class OpenAIClient {
 					new Promise( ( _, reject ) => setTimeout( () => reject( new Error( 'Timeout Completion' ) ), timeout ) ),
 				] );
 
-				const formattedCompletion = OpenAIClient.chatCompletionFormatting( escapeSpecialChars( completionObj.data.choices[ 0 ].message.content ) )
-
-				return formattedCompletion
+				return completionObj
 			} catch ( error ) {
 				console.error( `Erreur lors de la tentative ${attempt}:`, error );
 
