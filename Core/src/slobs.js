@@ -27,7 +27,7 @@ class SLOBS {
 				this.ws.send( JSON.stringify( authRequest ) );
 			} );
 
-			this.ws.on( 'message', ( data ) => {
+			this.ws.once( 'message', ( data ) => {
 				resolve();
 			} );
 
@@ -128,6 +128,32 @@ class SLOBS {
 			}
 		};
 		this.ws.send( JSON.stringify( setItemVisibilityRequest ) );
+	}
+
+	async startRecording() {
+		return await this.recordingRequest( 'start' );
+	}
+
+	async stopRecording() {
+		return await this.recordingRequest( 'stop' );
+	}
+
+	async recordingRequest( action ) {
+		return new Promise( ( resolve, reject ) => {
+			const request = {
+				jsonrpc: '2.0',
+				id: 1,
+				method: action + 'Recording',
+				params: {
+					resource: 'StreamingService'
+				}
+			};
+			this.ws.send( JSON.stringify( request ) );
+
+			this.ws.once( 'message', ( data ) => {
+				resolve();
+			} );
+		} );
 	}
 }
 

@@ -1,10 +1,14 @@
 const fs = require( 'fs' )
+const path = require( 'path' );
 const ytdl = require( 'ytdl-core' )
 const ffmpegPath = require( '@ffmpeg-installer/ffmpeg' ).path
 const ffmpeg = require( 'fluent-ffmpeg' )
 ffmpeg.setFfmpegPath( ffmpegPath )
 const { spawn } = require( 'node:child_process' )
-const path = require( 'path' );
+const DiscordBot = require( '../discord/bot.js' )
+const { getLatestFileFromDir } = require( '../utils.js' )
+const dotenv = require( 'dotenv' )
+dotenv.config()
 
 class SongRequest {
 	constructor( expressApp, openAiClient, vtsPlugin, slobs ) {
@@ -99,9 +103,12 @@ class SongRequest {
 			this.slobs.muteMic( true );
 			this.slobs.setSubtitleVisibility( false )
 
-			console.log( 'Start Song' )
+			await this.slobs.startRecording()
 			await this.startSong()
-			console.log( 'Song Done' )
+			await this.slobs.stopRecording()
+
+			DiscordBot.sendSongRequestVideoToChannel( 'post_music', getLatestFileFromDir( process.env.SONG_REQUEST_VIDEOS_DIR ), this.songName )
+
 			this.vtsPlugin.triggerHotkey( "BackgroundBedroom" )
 			this.vtsPlugin.triggerHotkey( "SongRequest" )
 

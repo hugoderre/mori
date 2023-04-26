@@ -1,3 +1,7 @@
+const fs = require( 'fs' );
+const path = require( 'path' );
+const axios = require( 'axios' );
+
 function getDateISO() {
 	let yourDate = new Date()
 	yourDate.toISOString().split( '.' )[ 0 ]
@@ -15,9 +19,6 @@ function escapeSpecialChars( str ) {
 }
 
 function downloadImageFromUrl( url, image_path ) {
-	const fs = require( 'fs' );
-	const axios = require( 'axios' );
-
 	return axios( {
 		url,
 		responseType: 'stream',
@@ -32,4 +33,26 @@ function downloadImageFromUrl( url, image_path ) {
 	);
 }
 
-module.exports = { getDateISO, escapeSpecialChars, downloadImageFromUrl }
+function getLatestFileFromDir( dirPath ) {
+	if ( !fs.existsSync( dirPath ) ) {
+		console.error( `The specified folder "${dirPath}" does not exist` );
+		return null;
+	}
+
+	const files = fs.readdirSync( dirPath );
+
+	let latestFile = null;
+	let latestTime = 0;
+	files.forEach( function ( file ) {
+		const filePath = path.join( dirPath, file );
+		const stat = fs.statSync( filePath );
+		if ( stat.isFile() && stat.mtimeMs > latestTime ) {
+			latestFile = filePath;
+			latestTime = stat.mtimeMs;
+		}
+	} );
+
+	return latestFile;
+}
+
+module.exports = { getDateISO, escapeSpecialChars, downloadImageFromUrl, getLatestFileFromDir }
