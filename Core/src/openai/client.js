@@ -181,7 +181,7 @@ class OpenAIClient {
 		}
 		await downloadImageFromUrl( imageUrl, imagePath )
 
-		DiscordBot.sendFileImageToChannel( 'post_image', imagePath, prompt )
+		DiscordBot.sendFileToChannel( 'post_image', imagePath, prompt )
 
 		this.vtsPlugin.triggerHotkey( "Painting" )
 		this.slobs.setChevaletVisibility( true )
