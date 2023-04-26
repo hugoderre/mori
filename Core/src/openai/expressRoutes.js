@@ -1,4 +1,5 @@
 const OpenAIClient = require( './../openai/client.js' )
+const { escapeSpecialChars } = require( './../utils.js' )
 
 class OpenAIExpressRoutes {
 	constructor( expressApp, openAIClient, messagesCollection ) {
@@ -101,7 +102,7 @@ class OpenAIExpressRoutes {
 
 			const prompt = {
 				messages: [
-					{ "role": 'user', "content": `Mori, the next messages are the Discord chat conversation with the viewer ${username}. For all the messages, answer briefly either in a evil and weird and cute way (with cute emotes for example). You love to answer in a strange or sometimes provocative or teasing way. ALWAYS keep this personality in mind.` },
+					{ "role": 'user', "content": `Mori, the next messages are the Discord chat conversation with the viewer ${username}. For all the messages, answer briefly either in a evil and weird and cute way (with cute emotes like ヾ(・ω・*)ノ for example). You love to answer in a strange or sometimes provocative or teasing way. ALWAYS keep this personality in mind.` },
 					...formattedPreviousUserMessages,
 					...req.body.messages
 				],
@@ -111,9 +112,9 @@ class OpenAIExpressRoutes {
 				system_context: "Currently, you are not in streaming and you are answering to people on your Discord server.",
 			}
 
-			let completion
+			let completionObj
 			try {
-				completion = await this.openAIClient.requestApiWithRetryAndTimeout(
+				completionObj = await this.openAIClient.requestApiWithRetryAndTimeout(
 					3,
 					1000,
 					11000,
@@ -127,6 +128,8 @@ class OpenAIExpressRoutes {
 				} );
 			}
 
+			const completion = OpenAIClient.chatCompletionFormatting( completionObj.data.choices[ 0 ].message.content )
+
 			const newMessage = {
 				timestamp: Date.now(),
 				message: req.body.messages[ 0 ].content,
@@ -135,7 +138,7 @@ class OpenAIExpressRoutes {
 			await this.messagesCollection.pushMessageUpsert(
 				`discord_chat_user_${username}`,
 				newMessage,
-				4
+				3
 			)
 
 			return res.send( {
