@@ -107,7 +107,14 @@ class SongRequest {
 			await this.startSong()
 			await this.slobs.stopRecording()
 
-			DiscordBot.sendSongRequestVideoToChannel( 'post_music', getLatestFileFromDir( process.env.SONG_REQUEST_VIDEOS_DIR ), this.songName )
+			// Wait for the video to be saved properly after stopping the recording
+			setTimeout( () => {
+				try {
+					DiscordBot.sendSongRequestVideoToChannel( 'post_music', getLatestFileFromDir( process.env.SONG_REQUEST_VIDEOS_DIR ), this.songName )
+				} catch ( error ) {
+					console.log( 'sendSongRequestVideoToChannel', error )
+				}
+			}, 5000 )
 
 			this.vtsPlugin.triggerHotkey( "BackgroundBedroom" )
 			this.vtsPlugin.triggerHotkey( "SongRequest" )
