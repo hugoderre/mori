@@ -98,6 +98,7 @@ class SongRequest {
 			this.openAiClient.isSongRequestInProcess = true
 			this.vtsPlugin.triggerHotkey( "BackgroundTransparent" )
 			this.vtsPlugin.triggerHotkey( "SongRequest" )
+			this.vtsPlugin.triggerHotkey( "BodySinging" )
 			this.writeSongNameInFile()
 			this.slobs.setSongNameVisibility( true )
 			this.slobs.muteMic( true );
@@ -118,6 +119,7 @@ class SongRequest {
 
 			this.vtsPlugin.triggerHotkey( "BackgroundBedroom" )
 			this.vtsPlugin.triggerHotkey( "SongRequest" )
+			this.vtsPlugin.triggerHotkey( "BodySinging" )
 
 			this.openAiClient.softQueueReset()
 		} catch ( error ) {

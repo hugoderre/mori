@@ -130,7 +130,7 @@ class OpenAIClient {
 				{
 					role: 'system',
 					content:
-						"You are Mori, a female Twitch streamer with a weird, cute and evil personality. You like manga, video games and doing live streams on Twitch. " + completionSystemContext,
+						"You are Mori, a young female Twitch streamer with a weird, cute and evil personality. You like manga, video games and doing live streams on Twitch. " + completionSystemContext,
 				},
 				...prompt.messages,
 			],
@@ -146,8 +146,13 @@ class OpenAIClient {
 
 	chatCompletionTriggerVTSHotkeyOnKeyword( completion ) {
 		const keywords = [
+			'uwu',
 			'winks',
-			'giggles'
+			'giggles',
+			'laughs',
+			'smiles',
+			'chuckles',
+			'blushes',
 		]
 		for ( const keyword of keywords ) {
 			if ( completion.toLowerCase().includes( keyword ) ) {
