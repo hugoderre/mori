@@ -25,8 +25,7 @@ class VoiceMakerAPI {
 			}
 
 			voiceMakerRequest.setVoice( "ai3-Nova" )
-			voiceMakerRequest.pitch = "8%"
-			voiceMakerRequest.speed = "100%"
+			voiceMakerRequest.pitch = 16
 			voiceMakerRequest.volume = 10
 
 			let outputPath;
