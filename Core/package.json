@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-	"discord-bot": "node index.js -d",
+    "discord-bot": "node index.js -d",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -47,6 +47,6 @@
     "validator": "^13.9.0",
     "voicemaker": "^0.2.4",
     "ws": "^8.13.0",
-    "ytdl-core": "github:fent/node-ytdl-core#pull/1203/head"
+    "ytdl-core": "github:khlevon/node-ytdl-core#v4.11.4-patch.1"
   }
 }
