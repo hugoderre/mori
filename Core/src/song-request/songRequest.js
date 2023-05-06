@@ -7,6 +7,8 @@ ffmpeg.setFfmpegPath( ffmpegPath )
 const { spawn } = require( 'node:child_process' )
 const DiscordBot = require( '../discord/bot.js' )
 const { getLatestFileFromDir } = require( '../utils.js' )
+const AudioContext = require( "web-audio-api" ).AudioContext;
+const MusicTempo = require( "music-tempo" );
 const dotenv = require( 'dotenv' )
 dotenv.config()
 
@@ -105,7 +107,9 @@ class SongRequest {
 			this.slobs.setSubtitleVisibility( false )
 
 			await this.slobs.startRecording()
+			await this.headbangOnTempo()
 			await this.startSong()
+			clearInterval( this.headbangInterval )
 			await this.slobs.stopRecording()
 
 			// Wait for the video to be saved properly after stopping the recording
@@ -193,6 +197,44 @@ class SongRequest {
 				}
 				resolve()
 			} )
+		} )
+	}
+
+	async headbangOnTempo() {
+		const tempo = await this.getSongTempo()
+
+		this.headbangInterval = setInterval( () => {
+			this.vtsPlugin.triggerHotkey( "Headbang" )
+		}, 60000 / tempo )
+	}
+
+	async getSongTempo() {
+		return new Promise( ( resolve, reject ) => {
+			const calcTempo = ( buffer ) => {
+				let audioData = [];
+				// Take the average of the two channels
+				if ( buffer.numberOfChannels == 2 ) {
+					const channel1Data = buffer.getChannelData( 0 );
+					const channel2Data = buffer.getChannelData( 1 );
+					for ( var i = 0; i < channel1Data.length; i++ ) {
+						audioData[ i ] = ( channel1Data[ i ] + channel2Data[ i ] ) / 2;
+					}
+				} else {
+					audioData = buffer.getChannelData( 0 );
+				}
+
+				const mt = new MusicTempo( audioData );
+
+				resolve( mt.tempo );
+			}
+
+			try {
+				const data = fs.readFileSync( "src/song-request/htdemucs/base_song/full.wav" );
+				const context = new AudioContext();
+				context.decodeAudioData( data, calcTempo );
+			} catch ( error ) {
+				reject( error )
+			}
 		} )
 	}
 

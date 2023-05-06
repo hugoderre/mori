@@ -37,6 +37,7 @@
     "js-sha256": "^0.9.0",
     "languagedetect": "^2.0.0",
     "mongodb": "^5.1.0",
+    "music-tempo": "^1.0.3",
     "openai": "^3.2.1",
     "passport": "^0.3.2",
     "passport-oauth": "^1.0.0",
@@ -46,6 +47,7 @@
     "tmi.js": "^1.8.5",
     "validator": "^13.9.0",
     "voicemaker": "^0.2.4",
+    "web-audio-api": "^0.2.2",
     "ws": "^8.13.0",
     "ytdl-core": "github:khlevon/node-ytdl-core#v4.11.4-patch.1"
   }
