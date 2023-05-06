@@ -23,6 +23,7 @@ class App {
 		await messagesCollection.initClient()
 
 		const openAIClient = new OpenAIClient( this.expressApp, messagesCollection, vtsPlugin, slobs )
+		openAIClient.initPromptQueue()
 
 		const openAIExpressRoutes = new OpenAIExpressRoutes( this.expressApp, openAIClient, messagesCollection )
 

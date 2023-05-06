@@ -49,21 +49,20 @@ class TmiApiClient {
 		const previousUserMessages = await this.messagesCollection.findMessagesByGroup( 'twitch_chat_conversation' ) ?? []
 		const formattedPreviousUserMessages = OpenAIClient.getFormattedPreviousUserMessages( previousUserMessages )
 
+		let personality
 		const personalityRandomizer = Math.random()
 
-		let personality
-
-		if ( personalityRandomizer < 0.5 ) {
-			personality = `For all the messages, answer briefly in an sarcastic way. You like to tease people.`
+		if ( personalityRandomizer < 0.7 ) {
+			personality = `For all the messages, answer briefly in a sarcastic and funny manner. You like to tease people.`
 		} else {
-			personality = `For all the messages, answer briefly in a cute way (say "UwU" only when it's appropriate and completion is cute!).`
+			personality = `For all the messages, answer briefly in a cute manner (say "UwU" only when it's appropriate and completion is cute!).`
 		}
 
 		this.openAIClient.queueUpPrompt(
 			{
 				type: 'chat_message',
 				messages: [
-					{ "role": 'user', "content": `Mori, the next messages are the Twitch chat conversation. Each message is preceded by the username of the viewer (Username: Message). ${personality}. ALWAYS keep this personality in mind.` },
+					{ "role": 'user', "content": `Mori, the next messages are the Twitch chat conversation. Each message is preceded by the username of the viewer (Username: Message). ${personality} Keep this prompt as a reference for all the next messages.` },
 					...formattedPreviousUserMessages,
 					{ "role": 'user', "content": fMessage }
 				],

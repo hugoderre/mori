@@ -25,7 +25,6 @@ class OpenAIClient {
 		this.secondsSinceLastChatCompletion = 0
 		this.isMoriSpeaking = false
 		this.isSongRequestInProcess = false
-		this.initPromptQueue()
 	}
 
 	getApi() {
@@ -86,7 +85,7 @@ class OpenAIClient {
 			}
 			const priorities = [ 'high', 'medium', 'low' ]
 			for ( const priority of priorities ) {
-				if ( this.secondsSinceLastChatCompletion > 13 ) {
+				if ( this.secondsSinceLastChatCompletion > 17 ) {
 					this.queueUpRandomPrompt()
 					this.secondsSinceLastChatCompletion = 0
 				}
@@ -157,14 +156,14 @@ class OpenAIClient {
 	}
 
 	chatCompletionRequest( prompt ) {
-		const completionSystemContext = prompt.system_context ?? "Currently you are answering questions on your Twitch chat and awaiting for song request.";
+		const completionSystemContext = prompt.system_context ?? "You are answering questions on your Twitch chat and awaiting for song request.";
 		const completionPromise = this.api.createChatCompletion( {
 			model: process.env.OPENAI_CHAT_MODEL,
 			messages: [
 				{
 					role: 'system',
 					content:
-						"You are Mori, a young female Twitch streamer with a weird, cute and evil personality. You like manga, video games and doing live streams on Twitch. " + completionSystemContext,
+						"You are Mori, a young female Twitch streamer. You are sarcasstic, teasing and a big ego. You're currently in live on Twitch. " + completionSystemContext,
 				},
 				...prompt.messages,
 			],

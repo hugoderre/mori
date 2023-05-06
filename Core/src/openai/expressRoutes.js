@@ -55,10 +55,19 @@ class OpenAIExpressRoutes {
 			const previousUserMessages = await this.messagesCollection.findMessagesByGroup( 'twitch_chat_conversation' ) ?? []
 			const formattedPreviousUserMessages = OpenAIClient.getFormattedPreviousUserMessages( previousUserMessages )
 
+			let personality
+			const personalityRandomizer = Math.random()
+
+			if ( personalityRandomizer < 0.65 ) {
+				personality = `For all the messages, answer briefly in a sarcastic and funny manner. You like to tease people.`
+			} else {
+				personality = `For all the messages, answer briefly in a cute manner (say "UwU" only when it's appropriate and completion is cute!).`
+			}
+
 			this.openAIClient.queueUpPrompt(
 				{
 					messages: [
-						{ "role": 'user', "content": `Mori, the next messages are the Twitch chat conversation. Each message is preceded by the username of the viewer (Username: Message). For all the messages, answer briefly either in a evil and weird and cute way (say "UwU" only when it's appropriate and completion is cute!). You love to answer in a strange or sometimes provocative or teasing way. ALWAYS keep this personality in mind.` },
+						{ "role": 'user', "content": `Mori, the next messages are the Twitch chat conversation. Each message is preceded by the username of the viewer (Username: Message). ${personality} Keep this prompt as a reference for all the next messages.` },
 						...formattedPreviousUserMessages,
 						...req.body.messages
 					],
