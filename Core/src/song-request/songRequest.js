@@ -44,7 +44,7 @@ class SongRequest {
 
 	listenSongRequestApproval() {
 		this.expressApp.post( '/song-request-approval', async ( req, res ) => {
-			this.songName = this.queueGetSongRequestNameById( req.body.song_request_id )
+			this.songName = req.body.song_name ?? this.queueGetSongRequestNameById( req.body.song_request_id )
 
 			if ( this.isSongRequestInProcess ) {
 				return res.send( 'Song request is in process.' )
