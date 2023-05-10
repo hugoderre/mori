@@ -20,7 +20,7 @@ class VoiceMakerAPI {
 			try {
 				voiceMakerRequest = new VoiceMakerRequest( message )
 			} catch ( error ) {
-				console.log( 'Error creating VoiceMakerRequest with message:', message )
+				console.error( 'Error creating VoiceMakerRequest with message:', message )
 				return reject( error )
 			}
 
@@ -32,7 +32,7 @@ class VoiceMakerAPI {
 			try {
 				outputPath = await this.voiceMakerEngine.getTts( voiceMakerRequest )
 			} catch ( error ) {
-				console.log( 'Error getting TTS with voiceMakerRequest' )
+				console.error( 'Error getting TTS with voiceMakerRequest' )
 				return reject( error )
 			}
 

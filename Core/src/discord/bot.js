@@ -16,7 +16,7 @@ class DiscordBot {
 			"content": {
 				"file_path": fileAbsPath,
 				"message_content": message,
-				"thread_name": "#3 Stream 30/04/2023"
+				"thread_name": "#9 Stream 10/05/2023"
 			}
 		} ).then( ( response ) => {
 			console.log( response.data )
@@ -58,7 +58,7 @@ class DiscordBot {
 				'-ac 2',
 			] )
 			.on( 'error', function ( err ) {
-				console.log( 'An error occurred: ' + err.message )
+				console.error( 'An error occurred: ' + err.message )
 			} )
 			.on( 'end', function () {
 				DiscordBot.sendFileToChannel( command, videoCompressedPath, songName )

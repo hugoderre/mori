@@ -54,7 +54,7 @@ class VtsPlugin {
 			} )
 
 			this.socket.on( 'close', () => {
-				console.log( 'Connexion fermée.' )
+				console.warn( 'Connexion fermée.' )
 			} )
 		} )
 	}

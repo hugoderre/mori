@@ -32,7 +32,7 @@ class SLOBS {
 			} );
 
 			this.ws.on( 'close', () => {
-				console.log( 'WebSocket connection closed' );
+				console.warn( 'WebSocket connection closed' );
 			} );
 		} );
 	}

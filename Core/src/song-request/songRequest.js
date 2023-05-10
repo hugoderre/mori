@@ -110,7 +110,7 @@ class SongRequest {
 			try {
 				await this.headbangOnTempo()
 			} catch ( error ) {
-				console.log( error )
+				console.error( error )
 			}
 			await this.startSong()
 			clearInterval( this.headbangInterval )
@@ -131,7 +131,7 @@ class SongRequest {
 
 			this.openAiClient.softQueueReset()
 		} catch ( error ) {
-			console.log( error )
+			console.error( error )
 		}
 		this.slobs.setSongNameVisibility( false )
 		this.slobs.muteMic( false );
@@ -192,7 +192,7 @@ class SongRequest {
 		return new Promise( ( resolve, reject ) => {
 			fs.writeFile( path.join( __dirname, 'slobs_song_name.txt' ), this.songName, ( err ) => {
 				if ( err ) {
-					console.log( err )
+					console.error( err )
 					reject( err )
 				}
 				resolve()

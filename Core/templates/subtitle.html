@@ -66,11 +66,7 @@
 
 				currentIndex++;
 
-				console.log( 'mainContainerWidth', mainContainer.clientWidth )
-				console.log( 'textContainerWidth', textContainer.clientWidth )
-
 				if ( textContainer.clientWidth === mainContainer.clientWidth && fontSize > 22 ) {
-					console.log( 'decrease font size' )
 					fontSize -= 0.1;
 					textContainer.style.fontSize = fontSize + 'px';
 				}
