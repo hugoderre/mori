@@ -52,7 +52,7 @@ class TmiApiClient {
 		let personality
 		const personalityRandomizer = Math.random()
 
-		if ( personalityRandomizer < 0.7 ) {
+		if ( personalityRandomizer < 0.8 ) {
 			personality = `For all the messages, answer briefly in a sarcastic and funny manner. You like to tease people.`
 		} else {
 			personality = `For all the messages, answer briefly in a cute manner (say "UwU" only when it's appropriate and completion is cute!).`
@@ -67,23 +67,22 @@ class TmiApiClient {
 					{ "role": 'user', "content": fMessage }
 				],
 				temperature: 1,
-				username
+				username,
+				callback: async ( completion ) => {
+					const newMessage = {
+						timestamp,
+						message: fMessage,
+						response: completion,
+					}
+					await this.messagesCollection.pushMessageUpsert(
+						'twitch_chat_conversation',
+						newMessage,
+						6
+					)
+				}
 			},
-			'low'
+			'medium'
 		)
-
-		this.expressApp.once( 'completion_completed', async ( data ) => {
-			const newMessage = {
-				timestamp,
-				message: fMessage,
-				response: data.completion,
-			}
-			await this.messagesCollection.pushMessageUpsert(
-				'twitch_chat_conversation',
-				newMessage,
-				6
-			)
-		} )
 	}
 
 	subCallback( channel, username, methods, msg, tags ) {

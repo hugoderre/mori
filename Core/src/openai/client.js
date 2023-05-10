@@ -41,28 +41,27 @@ class OpenAIClient {
 
 	queueUpRandomPrompt() {
 		const prompts = fs.readFileSync( './src/openai/random-prompts.txt', 'utf8' ).split( '\n' )
-		const content = prompts[ Math.floor( Math.random() * prompts.length ) ].replace( '\r', '' )
+		const prompt = prompts[ Math.floor( Math.random() * prompts.length ) ].replace( '\r', '' )
 		this.queueUpPrompt(
 			{
-				messages: [ { "role": "user", "content": content } ],
+				messages: [ { "role": "user", "content": prompt } ],
 				temperature: 1,
 				system_context: 'This next prompt is a custom prompt from your creator. Speak as if your completion came from your free will, without saying that it comes from your creator.',
+				callback: async ( completion ) => {
+					const newMessage = {
+						timestamp: Date.now(),
+						message: prompt,
+						response: completion,
+					}
+					await this.messagesCollection.pushMessageUpsert(
+						'twitch_chat_conversation',
+						newMessage,
+						6
+					)
+				}
 			},
-			'low'
+			'low',
 		)
-
-		this.expressApp.once( 'completion_completed', async ( data ) => {
-			const newMessage = {
-				timestamp: Date.now(),
-				message: content,
-				response: data.completion,
-			}
-			await this.messagesCollection.pushMessageUpsert(
-				'twitch_chat_conversation',
-				newMessage,
-				6
-			)
-		} )
 	}
 
 	queueReset() {
@@ -142,12 +141,8 @@ class OpenAIClient {
 				this.isMoriSpeaking = false
 			} );
 
-		this.expressApp.emit( 'completion_completed', {
-			"completion": completion
-		} )
-
 		if ( prompt.callback ) {
-			prompt.callback()
+			prompt.callback( completion )
 		}
 
 		this.secondsSinceLastChatCompletion = 0

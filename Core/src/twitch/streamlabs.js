@@ -30,7 +30,7 @@ class StreamlabsApiClient {
 							temperature: 1,
 							username: ''
 						},
-						'medium'
+						'low'
 					)
 					break
 				case 'donation':

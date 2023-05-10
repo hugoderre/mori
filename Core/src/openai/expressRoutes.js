@@ -25,22 +25,21 @@ class OpenAIExpressRoutes {
 					max_tokens: req.body.max_tokens ?? 200,
 					username: req.body.username ?? '',
 					system_context: 'This next prompt is a custom prompt from your creator. Speak as if your completion came from your free will, without saying that it comes from your creator.',
+					callback: async ( completion ) => {
+						const newMessage = {
+							timestamp: Date.now(),
+							message: req.body.messages[ 0 ].content,
+							response: completion,
+						}
+						await this.messagesCollection.pushMessageUpsert(
+							'twitch_chat_conversation',
+							newMessage,
+							6
+						)
+					}
 				},
 				'high'
 			)
-
-			this.expressApp.once( 'completion_completed', async ( data ) => {
-				const newMessage = {
-					timestamp: Date.now(),
-					message: req.body.messages[ 0 ].content,
-					response: data.completion,
-				}
-				await this.messagesCollection.pushMessageUpsert(
-					'twitch_chat_conversation',
-					newMessage,
-					6
-				)
-			} )
 
 			return res.send( 'Custom prompt done' )
 		} )
@@ -73,24 +72,22 @@ class OpenAIExpressRoutes {
 					],
 					temperature: 1,
 					max_tokens: req.body.max_tokens ?? 100,
-					username: req.body.username
+					username: req.body.username,
+					callback: async ( completion ) => {
+						const newMessage = {
+							timestamp: Date.now(),
+							message: req.body.messages[ 0 ].content,
+							response: completion,
+						}
+						await this.messagesCollection.pushMessageUpsert(
+							'twitch_chat_conversation',
+							newMessage,
+							6
+						)
+					}
 				},
 				'high'
 			)
-
-			this.expressApp.once( 'completion_completed', async ( data ) => {
-				const newMessage = {
-					timestamp: Date.now(),
-					message: req.body.messages[ 0 ].content,
-					response: data.completion,
-				}
-				await this.messagesCollection.pushMessageUpsert(
-					'twitch_chat_conversation',
-					newMessage,
-					6
-				)
-			} )
-
 
 			return res.send( 'Custom prompt done' )
 		} )
