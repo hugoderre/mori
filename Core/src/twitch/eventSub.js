@@ -112,7 +112,7 @@ class TwitchEventSub {
 					this.openAiClient.queueUpPrompt( {
 						type: 'chat_message',
 						messages: [
-							{ "role": 'user', "content": `Mori, the viewer "${username}" has just made a song request for the youtube music "${data.message}". Tell him you are learning the music right now and will play it in 5 minutes!` }
+							{ "role": 'user', "content": `Mori, the viewer "${username}" has just made a song request for the youtube music "${data.message}". Tell him you are learning the music right now and will play it in 2 minutes!` }
 						],
 						temperature: 0.9
 					},
