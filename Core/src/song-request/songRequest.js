@@ -107,7 +107,11 @@ class SongRequest {
 			this.slobs.setSubtitleVisibility( false )
 
 			await this.slobs.startRecording()
-			await this.headbangOnTempo()
+			try {
+				await this.headbangOnTempo()
+			} catch ( error ) {
+				console.log( error )
+			}
 			await this.startSong()
 			clearInterval( this.headbangInterval )
 			await this.slobs.stopRecording()
