@@ -39,7 +39,6 @@ class VtsPlugin {
 						resolve()
 						break
 					case 'HotkeyTriggerResponse':
-						console.log( message )
 						break
 					case 'APIError':
 						reject( new Error( message.data.message ) )

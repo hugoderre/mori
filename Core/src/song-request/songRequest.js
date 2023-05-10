@@ -177,10 +177,6 @@ class SongRequest {
 			const inferPath = path.join( __dirname, 'so-vits-svc/inference.py' );
 			const infer = spawn( 'py', [ inferPath ] );
 
-			infer.stdout.on( 'data', ( data ) => {
-				console.log( `stdout: ${data}` )
-			} )
-
 			infer.stderr.on( 'data', ( data ) => {
 				console.error( `stderr: ${data}` )
 				reject( `stderr: ${data}` )

@@ -35,7 +35,6 @@ class OpenAIClient {
 	}
 
 	queueUpPrompt( prompt, priority ) {
-		console.log( prompt, priority )
 		this.promptQueue[ priority ].push( prompt )
 	}
 
