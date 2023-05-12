@@ -117,15 +117,18 @@ class OpenAIClient {
 			return
 		}
 
+		const promptMessage = prompt.messages[ prompt.messages.length - 1 ].content
 		const completion = OpenAIClient.chatCompletionFormatting( escapeSpecialChars( completionObj.data.choices[ 0 ].message.content ) )
 
 		if ( prompt.type === 'vtsItemTrigger' ) {
 			this.vtsPlugin.triggerHotkey( prompt.vtsHotkeyName )
 		}
 
-		console.log( 'Completion received and formatted : ', completion )
+		console.log( '------------------' )
+		console.log( 'Prompt : ', promptMessage )
+		console.log( 'Completion : ', completion )
 
-		this.completionLogger.writeCompletion( prompt.messages[ prompt.messages.length - 1 ].content, completion )
+		this.completionLogger.writeCompletion( promptMessage, completion )
 
 		if ( prompt.type === 'chat_message' ) {
 			this.vtsPlugin.triggerHotkey( "Look Chat" )
