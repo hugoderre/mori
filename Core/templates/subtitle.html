@@ -23,11 +23,11 @@
 		}
 
 		#text-container {
+			font-size: 80px;
 			width: fit-content;
 			text-align: center;
 			display: inline-block;
-			-webkit-text-stroke: 2px black;
-			text-stroke: 2px black;
+			-webkit-text-stroke: 3.2px black;
 			color: white;
 			text-shadow: 1px 1px black;
 			line-height: 1.2;
@@ -51,8 +51,7 @@
 			const words = message.split( ' ' );
 
 			let currentIndex = 0;
-			let fontSize = 52;
-			textContainer.style.fontSize = fontSize + 'px';
+
 			const interval = setInterval( () => {
 				if ( currentIndex >= words.length ) {
 					clearInterval( interval );
@@ -66,10 +65,7 @@
 
 				currentIndex++;
 
-				if ( textContainer.clientWidth === mainContainer.clientWidth && fontSize > 22 ) {
-					fontSize -= 0.1;
-					textContainer.style.fontSize = fontSize + 'px';
-				}
+				window.scrollTo( 0, document.body.scrollHeight );
 			}, 350 );
 		} );
 	</script>
