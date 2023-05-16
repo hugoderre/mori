@@ -142,7 +142,7 @@ class VtsPlugin {
 		]
 		for ( const keyword of keywords ) {
 			if ( str.toLowerCase().includes( keyword ) ) {
-				this.vtsPlugin.triggerHotkey( keyword )
+				this.triggerHotkey( keyword )
 			}
 		}
 	}
