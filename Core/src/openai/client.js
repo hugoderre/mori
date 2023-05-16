@@ -136,7 +136,7 @@ class OpenAIClient {
 
 		this.voiceMakerAPI.runTTS( completion )
 			.then( () => {
-				this.chatCompletionTriggerVTSHotkeyOnKeyword( completion )
+				this.vtsPlugin.triggerHotkeyByKeywordInString( completion )
 			} )
 			.catch( ( error ) => {
 				console.error( 'Erreur lors du traitement Text-to-Speech : ', error )
@@ -172,24 +172,6 @@ class OpenAIClient {
 		} );
 
 		return completionPromise
-	}
-
-	chatCompletionTriggerVTSHotkeyOnKeyword( completion ) {
-		const keywords = [
-			'uwu',
-			'winks',
-			'giggles',
-			'laughs',
-			'smiles',
-			':)',
-			'chuckles',
-			'blushes',
-		]
-		for ( const keyword of keywords ) {
-			if ( completion.toLowerCase().includes( keyword ) ) {
-				this.vtsPlugin.triggerHotkey( keyword )
-			}
-		}
 	}
 
 	async runImageCompletion( prompt ) {

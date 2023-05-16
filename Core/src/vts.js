@@ -128,6 +128,24 @@ class VtsPlugin {
 
 		this.socket.send( JSON.stringify( request ) )
 	}
+
+	triggerHotkeyByKeywordInString( str ) {
+		const keywords = [
+			'uwu',
+			'winks',
+			'giggles',
+			'laughs',
+			'smiles',
+			':)',
+			'chuckles',
+			'blushes',
+		]
+		for ( const keyword of keywords ) {
+			if ( str.toLowerCase().includes( keyword ) ) {
+				this.vtsPlugin.triggerHotkey( keyword )
+			}
+		}
+	}
 }
 
 module.exports = VtsPlugin
