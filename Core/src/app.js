@@ -1,6 +1,6 @@
 const MessagesCollection = require( './mongo/messagesCollection.js' )
-const OpenAIClient = require( './openai/client.js' )
-const OpenAIExpressRoutes = require( './openai/expressRoutes.js' )
+const OpenAIClient = require( './ai/client.js' )
+const OpenAIExpressRoutes = require( './ai/expressRoutes.js' )
 const TwitchEventSub = require( './twitch/eventSub.js' )
 const StreamlabsApiClient = require( './twitch/streamlabs.js' )
 const TmiApiClient = require( './twitch/tmi.js' )

@@ -1,6 +1,6 @@
 const tmi = require( 'tmi.js' )
 const { escapeSpecialChars } = require( './../utils.js' )
-const OpenAIClient = require( './../openai/client.js' )
+const OpenAIClient = require( './../ai/client.js' )
 const dotenv = require( 'dotenv' )
 dotenv.config()
 
