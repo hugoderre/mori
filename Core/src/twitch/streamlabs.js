@@ -21,7 +21,7 @@ class StreamlabsApiClient {
 			const type = eventData.type
 			switch ( eventData.type ) {
 				case 'follow':
-					await this.OpenAIClient.queueUpPrompt(
+					this.OpenAIClient.queueUpPrompt(
 						{
 							type,
 							messages: [
@@ -34,7 +34,7 @@ class StreamlabsApiClient {
 					)
 					break
 				case 'donation':
-					await this.OpenAIClient.queueUpPrompt(
+					this.OpenAIClient.queueUpPrompt(
 						{
 							type,
 							messages: [
