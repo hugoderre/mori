@@ -144,7 +144,7 @@ class OpenAIExpressRoutes {
 			await this.messagesCollection.pushMessageUpsert(
 				`discord_chat_user_${username}`,
 				newMessage,
-				3
+				4
 			)
 
 			return res.send( {
