@@ -1,9 +1,9 @@
-const OpenAIClient = require( './client.js' )
+const LanguageModelClient = require( './LanguageModelClient.js' )
 const { escapeSpecialChars } = require( '../utils.js' )
 
-class OpenAIExpressRoutes {
-	constructor( expressApp, openAIClient, messagesCollection ) {
-		this.openAIClient = openAIClient
+class ExpressRoutes {
+	constructor( expressApp, languageModelClient, messagesCollection ) {
+		this.languageModelClient = languageModelClient
 		this.messagesCollection = messagesCollection
 		this.expressApp = expressApp
 		this.listenCustomPrompt()
@@ -18,7 +18,7 @@ class OpenAIExpressRoutes {
 				return res.send( 'Wrong body format' )
 			}
 
-			this.openAIClient.queueUpPrompt(
+			this.languageModelClient.queueUpPrompt(
 				{
 					messages: req.body.messages,
 					temperature: req.body.temperature ?? 1,
@@ -52,7 +52,7 @@ class OpenAIExpressRoutes {
 			}
 
 			const previousUserMessages = await this.messagesCollection.findMessagesByGroup( 'twitch_chat_conversation' ) ?? []
-			const formattedPreviousUserMessages = OpenAIClient.getFormattedPreviousUserMessages( previousUserMessages )
+			const formattedPreviousUserMessages = LanguageModelClient.getFormattedPreviousUserMessages( previousUserMessages )
 
 			let personality
 			const personalityRandomizer = Math.random()
@@ -63,7 +63,7 @@ class OpenAIExpressRoutes {
 				personality = `For all the messages, answer briefly in a cute manner (say "UwU" only when it's appropriate and completion is cute!).`
 			}
 
-			this.openAIClient.queueUpPrompt(
+			this.languageModelClient.queueUpPrompt(
 				{
 					messages: [
 						{ "role": 'user', "content": `Mori, the next messages are the Twitch chat conversation. Each message is preceded by the username of the viewer (Username: Message). ${personality} Keep this prompt as a reference for all the next messages.` },
@@ -104,7 +104,7 @@ class OpenAIExpressRoutes {
 
 			const username = req.body.username === 'Mori' ? 'Creator' : req.body.username
 			const previousUserMessages = await this.messagesCollection.findMessagesByGroup( `discord_chat_user_${username}` ) ?? []
-			const formattedPreviousUserMessages = OpenAIClient.getFormattedPreviousUserMessages( previousUserMessages )
+			const formattedPreviousUserMessages = LanguageModelClient.getFormattedPreviousUserMessages( previousUserMessages )
 
 			const prompt = {
 				messages: [
@@ -120,11 +120,11 @@ class OpenAIExpressRoutes {
 
 			let completionObj
 			try {
-				completionObj = await this.openAIClient.requestApiWithRetryAndTimeout(
+				completionObj = await this.languageModelClient.requestApiWithRetryAndTimeout(
 					3,
 					1000,
 					11000,
-					this.openAIClient.chatCompletionRequest.bind( this.openAIClient ),
+					this.languageModelClient.chatCompletionRequest.bind( this.languageModelClient ),
 					prompt
 				);
 			} catch ( error ) {
@@ -134,7 +134,7 @@ class OpenAIExpressRoutes {
 				} );
 			}
 
-			const completion = OpenAIClient.chatCompletionFormatting( completionObj.data.choices[ 0 ].message.content )
+			const completion = LanguageModelClient.chatCompletionFormatting( completionObj.data.choices[ 0 ].message.content )
 
 			const newMessage = {
 				timestamp: Date.now(),
@@ -180,4 +180,4 @@ class OpenAIExpressRoutes {
 	}
 }
 
-module.exports = OpenAIExpressRoutes
+module.exports = { ExpressRoutes }

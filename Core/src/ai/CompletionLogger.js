@@ -1,6 +1,6 @@
 const fs = require( 'fs' )
 const util = require( 'util' )
-const { getDateISO } = require( './utils' )
+const { getDateISO } = require( '../utils' )
 
 class CompletionLogger {
 	constructor() {

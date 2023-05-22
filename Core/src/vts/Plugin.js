@@ -2,7 +2,7 @@ const WebSocket = require( 'ws' )
 const dotenv = require( 'dotenv' )
 dotenv.config()
 
-class VtsPlugin {
+class Plugin {
 	constructor() {
 		this.socket = null
 		this.authToken = process.env.VTS_PLUGIN_AUTH_TOKEN ?? null
@@ -148,4 +148,4 @@ class VtsPlugin {
 	}
 }
 
-module.exports = VtsPlugin
+module.exports = { Plugin }

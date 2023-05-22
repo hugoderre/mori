@@ -1,13 +1,13 @@
 const tmi = require( 'tmi.js' )
-const { escapeSpecialChars } = require( './../utils.js' )
-const OpenAIClient = require( './../ai/client.js' )
+const { escapeSpecialChars } = require( '../utils.js' )
+const LanguageModelClient = require( '../ai/LanguageModelClient.js' )
 const dotenv = require( 'dotenv' )
 dotenv.config()
 
-class TmiApiClient {
-	constructor( expressApp, openAIClient, messagesCollection ) {
+class TmiClient {
+	constructor( expressApp, languageModelClient, messagesCollection ) {
 		this.expressApp = expressApp
-		this.openAIClient = openAIClient
+		this.languageModelClient = languageModelClient
 		this.messagesCollection = messagesCollection
 		this.startListeners()
 	}
@@ -47,7 +47,7 @@ class TmiApiClient {
 		}
 
 		const previousUserMessages = await this.messagesCollection.findMessagesByGroup( 'twitch_chat_conversation' ) ?? []
-		const formattedPreviousUserMessages = OpenAIClient.getFormattedPreviousUserMessages( previousUserMessages )
+		const formattedPreviousUserMessages = LanguageModelClient.getFormattedPreviousUserMessages( previousUserMessages )
 
 		let personality
 		const personalityRandomizer = Math.random()
@@ -58,7 +58,7 @@ class TmiApiClient {
 			personality = `For all the messages, answer briefly in a cute manner (say "UwU" only when it's appropriate and completion is cute!).`
 		}
 
-		this.openAIClient.queueUpPrompt(
+		this.languageModelClient.queueUpPrompt(
 			{
 				type: 'chat_message',
 				messages: [
@@ -86,7 +86,7 @@ class TmiApiClient {
 	}
 
 	subCallback( channel, username, methods, msg, tags ) {
-		this.openAIClient.queueUpPrompt( {
+		this.languageModelClient.queueUpPrompt( {
 			type: 'sub',
 			messages: [
 				{ "role": 'user', "content": `Mori, the viewer "${username}" just subscribed to your Twitch channel for the first time. Please thank him warmly and in a nice way.` }
@@ -99,7 +99,7 @@ class TmiApiClient {
 	}
 
 	cheerCallback( channel, tags, message ) {
-		this.openAIClient.queueUpPrompt( {
+		this.languageModelClient.queueUpPrompt( {
 			type: 'cheer',
 			messages: [
 				{ "role": 'user', "content": `Mori, the viewer "${tags.username}" has just offered ${tags.bits} bits to your Twitch channel. Please thank him warmly and in a nice way.` }
@@ -112,7 +112,7 @@ class TmiApiClient {
 	}
 
 	resubCallback( channel, username, streakMonths, msg, tags, methods ) {
-		this.openAIClient.queueUpPrompt( {
+		this.languageModelClient.queueUpPrompt( {
 			type: 'resub',
 			messages: [
 				{ "role": 'user', "content": `Mori, the viewer "${username}" has just re-subscribed to your Twitch channel. This is his ${tags[ 'badge-info' ].subscriber}th month of subscription. Please thank him warmly and in a nice way.` }
@@ -125,7 +125,7 @@ class TmiApiClient {
 	}
 
 	subgiftCallback( channel, username, streakMonths, recipient, methods, tags ) {
-		this.openAIClient.queueUpPrompt( {
+		this.languageModelClient.queueUpPrompt( {
 			type: 'subgift',
 			messages: [
 				{ "role": 'user', "content": `Mori, the viewer "${username}" has just offered a gift subscription to ${recipient} to your Twitch channel. Please thank ${username} warmly and in a nice way.` }
@@ -138,7 +138,7 @@ class TmiApiClient {
 	}
 
 	anonsubgiftCallback( channel, streakMonths, recipient, methods, tags ) {
-		this.openAIClient.queueUpPrompt( {
+		this.languageModelClient.queueUpPrompt( {
 			type: 'anonsubgift',
 			messages: [
 				{ "role": 'user', "content": `Mori, an anonymous viewer just offered a gift subscription to ${recipient} to your Twitch channel. Please thank this anonymous viewer warmly and in a creative way.` }
@@ -151,7 +151,7 @@ class TmiApiClient {
 	}
 
 	raidCallback( channel, username, viewers, tags ) {
-		this.openAIClient.queueUpPrompt( {
+		this.languageModelClient.queueUpPrompt( {
 			type: 'raid',
 			messages: [
 				{ "role": 'user', "content": `Mori, you just received a raid on your Twitch channel from ${username}, thank him warmly and welcome the ${viewers} viewers!` }
@@ -185,4 +185,4 @@ class TmiApiClient {
 	}
 }
 
-module.exports = TmiApiClient
+module.exports = TmiClient

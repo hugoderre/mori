@@ -5,7 +5,7 @@ const ffmpegPath = require( '@ffmpeg-installer/ffmpeg' ).path
 const ffmpeg = require( 'fluent-ffmpeg' )
 ffmpeg.setFfmpegPath( ffmpegPath )
 const { spawn } = require( 'node:child_process' )
-const DiscordBot = require( '../discord/bot.js' )
+const { Bot: DiscordBot } = require( '../discord/Bot.js' )
 const { getLatestFileFromDir } = require( '../utils.js' )
 const AudioContext = require( "web-audio-api" ).AudioContext;
 const MusicTempo = require( "music-tempo" );

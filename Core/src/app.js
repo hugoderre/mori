@@ -1,12 +1,12 @@
-const MessagesCollection = require( './mongo/messagesCollection.js' )
-const OpenAIClient = require( './ai/client.js' )
-const OpenAIExpressRoutes = require( './ai/expressRoutes.js' )
-const TwitchEventSub = require( './twitch/eventSub.js' )
-const StreamlabsApiClient = require( './twitch/streamlabs.js' )
-const TmiApiClient = require( './twitch/tmi.js' )
-const VtsPlugin = require( './vts.js' )
+const MessagesCollection = require( './mongo/MessagesCollection.js' )
+const LanguageModelClient = require( './ai/LanguageModelClient.js' )
+const { ExpressRoutes: LanguageModelExpressRoutes } = require( './ai/ExpressRoutes.js' )
+const { EventSub: TwitchEventSub } = require( './twitch/EventSub.js' )
+const StreamlabsApiClient = require( './twitch/StreamlabsClient.js' )
+const TmiClient = require( './twitch/TmiClient.js' )
+const { Plugin: VtsPlugin } = require( './vts/Plugin.js' )
 const SongRequest = require( './song-request/songRequest.js' )
-const SLOBS = require( './slobs.js' )
+const SlobsWebsocket = require( './streamlabs/SlobsWebsocket.js' )
 
 class App {
 	constructor( expressApp ) {
@@ -14,7 +14,7 @@ class App {
 	}
 
 	async init() {
-		const slobs = new SLOBS()
+		const slobs = new SlobsWebsocket()
 
 		const vtsPlugin = new VtsPlugin()
 		await vtsPlugin.init()
@@ -22,27 +22,27 @@ class App {
 		const messagesCollection = new MessagesCollection()
 		await messagesCollection.initClient()
 
-		const openAIClient = new OpenAIClient( this.expressApp, messagesCollection, vtsPlugin, slobs )
-		openAIClient.initPromptQueue()
+		const languageModelClient = new LanguageModelClient( this.expressApp, messagesCollection, vtsPlugin, slobs )
+		languageModelClient.initPromptQueue()
 
-		const openAIExpressRoutes = new OpenAIExpressRoutes( this.expressApp, openAIClient, messagesCollection )
+		const languageModelExpressRoutes = new LanguageModelExpressRoutes( this.expressApp, languageModelClient, messagesCollection )
 
-		const songRequest = new SongRequest( this.expressApp, openAIClient, vtsPlugin, slobs )
+		const songRequest = new SongRequest( this.expressApp, languageModelClient, vtsPlugin, slobs )
 
-		const twitchEventSub = new TwitchEventSub( openAIClient, vtsPlugin, songRequest )
+		const twitchEventSub = new TwitchEventSub( languageModelClient, vtsPlugin, songRequest )
 
-		const tmi = new TmiApiClient( this.expressApp, openAIClient, messagesCollection )
+		const tmi = new TmiClient( this.expressApp, languageModelClient, messagesCollection )
 
-		const streamlabs = new StreamlabsApiClient( openAIClient )
+		const streamlabs = new StreamlabsApiClient( languageModelClient )
 	}
 
 	async discordBotStandalone() {
 		const messagesCollection = new MessagesCollection()
 		await messagesCollection.initClient()
 
-		const openAIClient = new OpenAIClient( this.expressApp, messagesCollection )
+		const languageModelClient = new LanguageModelClient( this.expressApp, messagesCollection )
 
-		const openAIExpressRoutes = new OpenAIExpressRoutes( this.expressApp, openAIClient, messagesCollection )
+		const languageModelExpressRoutes = new LanguageModelExpressRoutes( this.expressApp, languageModelClient, messagesCollection )
 	}
 }
 

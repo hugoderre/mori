@@ -1,4 +1,4 @@
-const MongoCrud = require( './mongoCrud' )
+const { Crud: MongoCrud } = require( './Crud' )
 
 class MessagesCollection extends MongoCrud {
 	async pushMessageUpsert( group, newMessage, limit ) {

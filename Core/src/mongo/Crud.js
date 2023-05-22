@@ -2,7 +2,7 @@ const { MongoClient, ServerApiVersion } = require( 'mongodb' )
 const dotenv = require( 'dotenv' )
 dotenv.config()
 
-class MongoCrud {
+class Crud {
 	constructor() {
 		this.client = null
 	}
@@ -41,4 +41,4 @@ class MongoCrud {
 	}
 }
 
-module.exports = MongoCrud
+module.exports = { Crud }

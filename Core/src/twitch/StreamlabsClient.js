@@ -2,9 +2,9 @@ const io = require( 'socket.io-client' )
 const dotenv = require( 'dotenv' )
 dotenv.config()
 
-class StreamlabsApiClient {
-	constructor( OpenAIClient ) {
-		this.OpenAIClient = OpenAIClient
+class StreamlabsClient {
+	constructor( LanguageModelClient ) {
+		this.LanguageModelClient = LanguageModelClient
 		this.startListeners()
 	}
 
@@ -21,7 +21,7 @@ class StreamlabsApiClient {
 			const type = eventData.type
 			switch ( eventData.type ) {
 				case 'follow':
-					this.OpenAIClient.queueUpPrompt(
+					this.LanguageModelClient.queueUpPrompt(
 						{
 							type,
 							messages: [
@@ -34,7 +34,7 @@ class StreamlabsApiClient {
 					)
 					break
 				case 'donation':
-					this.OpenAIClient.queueUpPrompt(
+					this.LanguageModelClient.queueUpPrompt(
 						{
 							type,
 							messages: [
@@ -55,4 +55,4 @@ class StreamlabsApiClient {
 	}
 }
 
-module.exports = StreamlabsApiClient
+module.exports = StreamlabsClient

@@ -1,13 +1,13 @@
 const fs = require( 'fs' )
 require( 'dotenv' ).config()
 const { Configuration, OpenAIApi } = require( 'openai' )
-const VoiceMakerAPI = require( '../tts/voicemaker.js' )
-const CompletionLogger = require( '../logger.js' )
-const DiscordBot = require( '../discord/bot.js' )
+const VoiceMakerAPI = require( '../tts/VoicemakerClient.js' )
+const CompletionLogger = require( './CompletionLogger.js' )
+const { Bot: DiscordBot } = require( '../discord/Bot.js' )
 const { sha256 } = require( 'js-sha256' )
 const { escapeSpecialChars, downloadImageFromUrl } = require( '../utils.js' )
 
-class OpenAIClient {
+class LanguageModelClient {
 	constructor( expressApp, messagesCollection, vtsPlugin, slobs ) {
 		this.expressApp = expressApp
 		this.messagesCollection = messagesCollection
@@ -118,7 +118,7 @@ class OpenAIClient {
 		}
 
 		const promptMessage = prompt.messages[ prompt.messages.length - 1 ].content
-		const completion = OpenAIClient.chatCompletionFormatting( escapeSpecialChars( completionObj.data.choices[ 0 ].message.content ) )
+		const completion = LanguageModelClient.chatCompletionFormatting( escapeSpecialChars( completionObj.data.choices[ 0 ].message.content ) )
 
 		if ( prompt.type === 'vtsItemTrigger' ) {
 			this.vtsPlugin.triggerHotkey( prompt.vtsHotkeyName )
@@ -199,7 +199,6 @@ class OpenAIClient {
 		}
 		await downloadImageFromUrl( imageUrl, imagePath )
 
-		DiscordBot.sendFileToChannel( 'post_image', imagePath, prompt )
 
 		this.vtsPlugin.triggerHotkey( "Painting" )
 		this.slobs.setChevaletVisibility( true )
@@ -220,6 +219,8 @@ class OpenAIClient {
 		},
 			'high'
 		)
+
+		DiscordBot.sendFileToChannel( 'post_image', imagePath, prompt )
 
 		return imageUrl
 	}
@@ -277,4 +278,4 @@ class OpenAIClient {
 	}
 }
 
-module.exports = OpenAIClient
+module.exports = LanguageModelClient

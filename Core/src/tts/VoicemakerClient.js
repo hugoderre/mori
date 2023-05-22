@@ -1,8 +1,8 @@
 const { spawn } = require( 'node:child_process' )
 const { VoiceMaker, VoiceMakerRequest } = require( 'voicemaker' )
-const SubTitle = require( './subtitle.js' )
+const SubTitle = require( './SubTitle.js' )
 
-class VoiceMakerAPI {
+class VoiceMakerClient {
 	constructor( openaiClientInstance ) {
 		this.openaiClientInstance = openaiClientInstance
 		this.voiceMakerEngine = new VoiceMaker()
@@ -47,4 +47,4 @@ class VoiceMakerAPI {
 	}
 }
 
-module.exports = VoiceMakerAPI
+module.exports = VoiceMakerClient

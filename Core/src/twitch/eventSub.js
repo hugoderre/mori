@@ -3,7 +3,7 @@ const { RefreshingAuthProvider } = require( '@twurple/auth' )
 const fs = require( 'fs' ).promises
 require( 'dotenv' ).config()
 
-class TwitchEventSub {
+class EventSub {
 	constructor( openAiClient, vtsPlugin, songRequest ) {
 		this.openAiClient = openAiClient
 		this.vtsPlugin = vtsPlugin
@@ -141,4 +141,4 @@ class TwitchEventSub {
 	}
 }
 
-module.exports = TwitchEventSub
+module.exports = { EventSub }

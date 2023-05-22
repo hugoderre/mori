@@ -2,7 +2,7 @@ const path = require( 'path' )
 const fs = require( 'fs' )
 const axios = require( 'axios' )
 
-class DiscordBot {
+class Bot {
 	static sendFileToChannel( command, filePath, message = '' ) {
 		const fileAbsPath = path.resolve( filePath )
 
@@ -16,7 +16,7 @@ class DiscordBot {
 			"content": {
 				"file_path": fileAbsPath,
 				"message_content": message,
-				"thread_name": "#9 Stream 10/05/2023"
+				"thread_name": "#12 Stream 20/05/2023"
 			}
 		} ).then( ( response ) => {
 			console.log( response.data )
@@ -68,4 +68,4 @@ class DiscordBot {
 	}
 }
 
-module.exports = DiscordBot
+module.exports = { Bot }
