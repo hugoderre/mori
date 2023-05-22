@@ -6,12 +6,17 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap" rel="stylesheet">
 	<style>
+		@font-face {
+			font-family: 'SFCartoonistHand-Bold';
+  			src: url('http://localhost:3000/assets/fonts/SFCartoonistHand-Bold.ttf') format('truetype');
+		}
+
 		body {
 			margin: 0;
 			padding: 0;
 			background-color: transparent;
-			font-family: 'Kalam', cursive;
-			font-weight: 700;
+			font-family: 'SFCartoonistHand-Bold', sans-serif;
+			letter-spacing: 2px;
 		}
 
 		#main-container {
@@ -23,14 +28,20 @@
 		}
 
 		#text-container {
-			font-size: 80px;
+			font-size: 115px;
+			font-weight: 900;
 			width: fit-content;
 			text-align: center;
 			display: inline-block;
-			-webkit-text-stroke: 3.2px black;
+			line-height: 1;
 			color: white;
-			text-shadow: 1px 1px black;
-			line-height: 1.2;
+			text-shadow: 
+				1px 1px 0 black,  
+				2px 2px 0 black,
+				3px 3px 0 black,
+				4px 4px 0 black,
+				5px 5px 0 black;
+			-webkit-text-stroke: 3.2px black;
 		}
 	</style>
 </head>
