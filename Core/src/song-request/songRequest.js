@@ -201,7 +201,7 @@ class SongRequest {
 
 	async writeSongNameInFile() {
 		return new Promise( ( resolve, reject ) => {
-			fs.writeFile( path.join( __dirname, 'slobs_song_name.txt' ), this.songName, ( err ) => {
+			fs.writeFile( './assets/slobs/txt/slobs_song_name.txt', this.songName, ( err ) => {
 				if ( err ) {
 					console.error( err )
 					reject( err )

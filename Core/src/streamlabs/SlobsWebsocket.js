@@ -96,6 +96,13 @@ class SlobsWebsocket {
 		)
 	}
 
+	setReplyToVisibility( isVisible ) {
+		this.setItemVisibility(
+			"SceneItem[\"scene_e43629ca-5841-4906-aaad-961c51a0a2dd\", \"4dfa95f9-17cf-4afd-90d3-a49eeebf7a94\", \"text_gdiplus_05851119-7baa-4262-bb28-27df0f182ab3\"]",
+			isVisible
+		)
+	}
+
 	setSubtitleVisibility( isVisible ) {
 		this.setItemVisibility(
 			"SceneItem[\"scene_e43629ca-5841-4906-aaad-961c51a0a2dd\", \"a160f1c4-f98e-44e9-8101-ada16d090def\", \"browser_source_f7dfc909-ca56-4573-9634-4f4953098677\"]",

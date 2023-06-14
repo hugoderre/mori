@@ -63,6 +63,7 @@ class LanguageModelClient {
 
 		if ( prompt.type === 'chat_message' ) {
 			this.vtsPlugin.triggerHotkey( "Look Chat" )
+			fs.writeFileSync( './assets/slobs/txt/reply_to.txt', 'Reply to ' + promptMessage.slice( 0, 40 ) + '...' )
 		}
 
 		await this.voiceMakerAPI.runTTS( completion )
@@ -72,6 +73,8 @@ class LanguageModelClient {
 			.catch( ( error ) => {
 				console.error( 'Erreur lors du traitement Text-to-Speech : ', error )
 			} );
+
+		fs.writeFileSync( './assets/slobs/txt/reply_to.txt', '' )
 
 		if ( prompt.callback ) {
 			prompt.callback( completion )
@@ -193,7 +196,7 @@ class LanguageModelClient {
 	}
 
 	queueUpRandomPrompt() {
-		const prompts = fs.readFileSync( './src/ai/random-prompts.txt', 'utf8' ).split( '\n' )
+		const prompts = fs.readFileSync( './data/random_prompts.txt', 'utf8' ).split( '\n' )
 		const prompt = prompts[ Math.floor( Math.random() * prompts.length ) ].replace( '\r', '' )
 		this.promptQueue.add(
 			{
