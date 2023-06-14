@@ -8,22 +8,15 @@ const { sha256 } = require( 'js-sha256' )
 const { escapeSpecialChars, downloadImageFromUrl } = require( '../utils.js' )
 
 class LanguageModelClient {
-	constructor( expressApp, messagesCollection, vtsPlugin, slobs ) {
+	constructor( expressApp, messagesCollection, vtsPlugin, slobs, promptQueue ) {
 		this.expressApp = expressApp
 		this.messagesCollection = messagesCollection
 		this.vtsPlugin = vtsPlugin
 		this.slobs = slobs
+		this.promptQueue = promptQueue
 		this.api = this.getApi()
 		this.voiceMakerAPI = new VoiceMakerAPI( this )
 		this.completionLogger = new CompletionLogger()
-		this.promptQueue = {
-			low: [],
-			medium: [],
-			high: []
-		}
-		this.promptQueueIntervalRef = null
-		this.secondsSinceLastChatCompletion = 0
-		this.isMoriSpeaking = false
 		this.isSongRequestInProcess = false
 	}
 
@@ -34,75 +27,14 @@ class LanguageModelClient {
 		return new OpenAIApi( configuration );
 	}
 
-	queueUpPrompt( prompt, priority ) {
-		this.promptQueue[ priority ].push( prompt )
-	}
-
-	queueUpRandomPrompt() {
-		const prompts = fs.readFileSync( './src/ai/random-prompts.txt', 'utf8' ).split( '\n' )
-		const prompt = prompts[ Math.floor( Math.random() * prompts.length ) ].replace( '\r', '' )
-		this.queueUpPrompt(
-			{
-				messages: [ { "role": "user", "content": prompt } ],
-				temperature: 1,
-				system_context: 'This next prompt is a custom prompt from your creator. Speak as if your completion came from your free will, without saying that it comes from your creator.',
-				callback: async ( completion ) => {
-					const newMessage = {
-						timestamp: Date.now(),
-						message: prompt,
-						response: completion,
-					}
-					await this.messagesCollection.pushMessageUpsert(
-						'twitch_chat_conversation',
-						newMessage,
-						6
-					)
-				}
-			},
-			'low',
-		)
-	}
-
-	queueReset() {
-		this.promptQueue = {
-			low: [],
-			medium: [],
-			high: []
-		}
-	}
-
-	softQueueReset() {
-		this.promptQueue.medium = []
-		this.promptQueue.low = []
-	}
-
-	initPromptQueue() {
-		this.promptQueueIntervalRef = setInterval( async () => {
-			if ( this.isMoriSpeaking || this.isSongRequestInProcess ) {
-				return
-			}
-			const priorities = [ 'high', 'medium', 'low' ]
-			for ( const priority of priorities ) {
-				if ( this.secondsSinceLastChatCompletion > 17 ) {
-					this.queueUpRandomPrompt()
-					this.secondsSinceLastChatCompletion = 0
-				}
-				if ( !this.promptQueue[ priority ][ 0 ] ) {
-					continue
-				}
-				await this.runChatCompletion( this.promptQueue[ priority ].pop() )
-				break
-			}
-			this.secondsSinceLastChatCompletion++
-		}, 1000 );
+	/**
+	 * Fire by prompt queue
+	 */
+	async runProcess( prompt ) {
+		await this.runChatCompletion( prompt )
 	}
 
 	async runChatCompletion( prompt ) {
-		if ( this.isMoriSpeaking || this.isSongRequestInProcess ) {
-			return
-		}
-		this.isMoriSpeaking = true
-
 		if ( prompt.type === 'chat_message' ) {
 			this.vtsPlugin.triggerHotkey( "Look Chat" )
 		}
@@ -112,7 +44,6 @@ class LanguageModelClient {
 		try {
 			completionObj = await this.requestApiWithRetryAndTimeout( 3, 1000, 20000, this.chatCompletionRequest.bind( this ), prompt );
 		} catch ( error ) {
-			this.isMoriSpeaking = false
 			console.error( "Erreur lors de la création de la completion :", error );
 			return
 		}
@@ -134,13 +65,12 @@ class LanguageModelClient {
 			this.vtsPlugin.triggerHotkey( "Look Chat" )
 		}
 
-		this.voiceMakerAPI.runTTS( completion )
+		await this.voiceMakerAPI.runTTS( completion )
 			.then( () => {
 				this.vtsPlugin.triggerHotkeyByKeywordInString( completion )
 			} )
 			.catch( ( error ) => {
 				console.error( 'Erreur lors du traitement Text-to-Speech : ', error )
-				this.isMoriSpeaking = false
 			} );
 
 		if ( prompt.callback ) {
@@ -205,7 +135,8 @@ class LanguageModelClient {
 		this.slobs.setPaintingCompletedVisibility( false )
 
 		// Queue up a chat completion (painting done) + callback that display image on screen
-		this.queueUpPrompt( {
+		this.promptQueue.add( {
+			module: 'llm',
 			type: 'chat_message',
 			messages: [
 				{ "role": 'user', "content": `Mori, you just finished painting your canvas on the theme "${prompt}" and it is now on the screen! React briefly on what you think of your painting!` }
@@ -217,7 +148,7 @@ class LanguageModelClient {
 				this.slobs.setPaintingCompletedVisibility( true )
 			}
 		},
-			'high'
+			'veryhigh'
 		)
 
 		DiscordBot.sendFileToChannel( 'post_image', imagePath, prompt )
@@ -259,6 +190,32 @@ class LanguageModelClient {
 		}
 
 		throw new Error( "Nombre maximal de tentatives atteint. Échec de la requête." );
+	}
+
+	queueUpRandomPrompt() {
+		const prompts = fs.readFileSync( './src/ai/random-prompts.txt', 'utf8' ).split( '\n' )
+		const prompt = prompts[ Math.floor( Math.random() * prompts.length ) ].replace( '\r', '' )
+		this.promptQueue.add(
+			{
+				module: 'llm',
+				messages: [ { "role": "user", "content": prompt } ],
+				temperature: 1,
+				system_context: 'This next prompt is a custom prompt from your creator. Speak as if your completion came from your free will, without saying that it comes from your creator.',
+				callback: async ( completion ) => {
+					const newMessage = {
+						timestamp: Date.now(),
+						message: prompt,
+						response: completion,
+					}
+					await this.messagesCollection.pushMessageUpsert(
+						'twitch_chat_conversation',
+						newMessage,
+						6
+					)
+				}
+			},
+			'low',
+		)
 	}
 
 	static chatCompletionFormatting( completion ) {

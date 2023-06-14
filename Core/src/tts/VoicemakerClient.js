@@ -39,7 +39,6 @@ class VoiceMakerClient {
 			this.subTitleEngine.send( message )
 			const vlcProcess = spawn( 'vlc', [ '--intf', 'dummy', '--no-video', '--play-and-exit', outputPath ] )
 			vlcProcess.on( 'close', ( code ) => {
-				this.openaiClientInstance.isMoriSpeaking = false
 				console.log( 'TTS DONE' )
 				resolve()
 			} )

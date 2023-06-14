@@ -4,10 +4,11 @@ const fs = require( 'fs' ).promises
 require( 'dotenv' ).config()
 
 class EventSub {
-	constructor( openAiClient, vtsPlugin, songRequest ) {
+	constructor( openAiClient, vtsPlugin, songRequest, promptQueue ) {
 		this.openAiClient = openAiClient
 		this.vtsPlugin = vtsPlugin
 		this.songRequest = songRequest
+		this.promptQueue = promptQueue
 		this.clientId = process.env.TWITCH_CLIENT_ID
 		this.clientSecret = process.env.TWITCH_CLIENT_SECRET
 		this.userId = process.env.TWITCH_USER_ID
@@ -40,7 +41,8 @@ class EventSub {
 			const username = data.userDisplayName == 'Mori_IA' ? 'Creator' : data.userDisplayName
 			switch ( data.rewardId ) {
 				case process.env.REWARD_ID_DRINK:
-					this.openAiClient.queueUpPrompt( {
+					this.promptQueue.add( {
+						module: 'llm',
 						type: 'vtsItemTrigger',
 						vtsHotkeyName: 'Drink',
 						messages: [
@@ -52,7 +54,8 @@ class EventSub {
 					)
 					break
 				case process.env.REWARD_ID_PET:
-					this.openAiClient.queueUpPrompt( {
+					this.promptQueue.add( {
+						module: 'llm',
 						type: 'vtsItemTrigger',
 						vtsHotkeyName: 'Pet the Mori',
 						messages: [
@@ -64,7 +67,8 @@ class EventSub {
 					)
 					break
 				case process.env.REWARD_ID_SUNGLASSES:
-					this.openAiClient.queueUpPrompt( {
+					this.promptQueue.add( {
+						module: 'llm',
 						type: 'vtsItemTrigger',
 						vtsHotkeyName: 'Sunglasses',
 						messages: [
@@ -76,7 +80,8 @@ class EventSub {
 					)
 					break
 				case process.env.REWARD_ID_HAMMER:
-					this.openAiClient.queueUpPrompt( {
+					this.promptQueue.add( {
+						module: 'llm',
 						type: 'vtsItemTrigger',
 						vtsHotkeyName: 'Hammer',
 						messages: [
@@ -109,7 +114,8 @@ class EventSub {
 					this.vtsPlugin.triggerHotkey( 'BackgroundBedroom' )
 					break
 				case process.env.REWARD_ID_SONG_REQUEST:
-					this.openAiClient.queueUpPrompt( {
+					this.promptQueue.add( {
+						module: 'llm',
 						type: 'chat_message',
 						messages: [
 							{ "role": 'user', "content": `Mori, the viewer "${username}" has just made a song request for the youtube music "${data.message}". Tell him you are learning the music right now and will play it in 2 minutes!` }
@@ -121,7 +127,8 @@ class EventSub {
 					this.songRequest.queueUpSongRequest( data.message )
 					break
 				case process.env.REWARD_ID_PAINT_REQUEST:
-					this.openAiClient.queueUpPrompt( {
+					this.promptQueue.add( {
+						module: 'llm',
 						type: 'chat_message',
 						messages: [
 							{ "role": 'user', "content": `Mori, the viewer "${username}" has just made a painting request with the theme "${data.message}". Tell him briefly that you are drawing and that will be displayed on the screen if it looks good!` }

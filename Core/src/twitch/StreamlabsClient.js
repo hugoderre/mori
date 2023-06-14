@@ -3,8 +3,8 @@ const dotenv = require( 'dotenv' )
 dotenv.config()
 
 class StreamlabsClient {
-	constructor( LanguageModelClient ) {
-		this.LanguageModelClient = LanguageModelClient
+	constructor( promptQueue ) {
+		this.promptQueue = promptQueue
 		this.startListeners()
 	}
 
@@ -21,8 +21,9 @@ class StreamlabsClient {
 			const type = eventData.type
 			switch ( eventData.type ) {
 				case 'follow':
-					this.LanguageModelClient.queueUpPrompt(
+					this.promptQueue.add(
 						{
+							module: 'llm',
 							type,
 							messages: [
 								{ "role": "user", "content": `Mori, the viewer "${eventData.message[ 0 ].name}" just followed your twitch channel! Welcome him in a concise way.` }
@@ -34,8 +35,9 @@ class StreamlabsClient {
 					)
 					break
 				case 'donation':
-					this.LanguageModelClient.queueUpPrompt(
+					this.promptQueue.add(
 						{
+							module: 'llm',
 							type,
 							messages: [
 								{ "role": "user", "content": `Mori, the viewer "${eventData.message[ 0 ].name}" just gave ${eventData.message[ 0 ].formatted_amount} to your Twitch channel! Thank him very warmly.` }

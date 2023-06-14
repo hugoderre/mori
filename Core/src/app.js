@@ -1,3 +1,4 @@
+const PromptQueue = require( './PromptQueue.js' )
 const MessagesCollection = require( './mongo/MessagesCollection.js' )
 const LanguageModelClient = require( './ai/LanguageModelClient.js' )
 const { ExpressRoutes: LanguageModelExpressRoutes } = require( './ai/ExpressRoutes.js' )
@@ -14,6 +15,8 @@ class App {
 	}
 
 	async init() {
+		const promptQueue = new PromptQueue()
+
 		const slobs = new SlobsWebsocket()
 
 		const vtsPlugin = new VtsPlugin()
@@ -22,18 +25,22 @@ class App {
 		const messagesCollection = new MessagesCollection()
 		await messagesCollection.initClient()
 
-		const languageModelClient = new LanguageModelClient( this.expressApp, messagesCollection, vtsPlugin, slobs )
-		languageModelClient.initPromptQueue()
+		const languageModelClient = new LanguageModelClient( this.expressApp, messagesCollection, vtsPlugin, slobs, promptQueue )
 
-		const languageModelExpressRoutes = new LanguageModelExpressRoutes( this.expressApp, languageModelClient, messagesCollection )
+		const languageModelExpressRoutes = new LanguageModelExpressRoutes( this.expressApp, languageModelClient, messagesCollection, promptQueue )
 
-		const songRequest = new SongRequest( this.expressApp, languageModelClient, vtsPlugin, slobs )
+		const songRequest = new SongRequest( this.expressApp, vtsPlugin, slobs, promptQueue )
 
-		const twitchEventSub = new TwitchEventSub( languageModelClient, vtsPlugin, songRequest )
+		const twitchEventSub = new TwitchEventSub( languageModelClient, vtsPlugin, songRequest, promptQueue )
 
-		const tmi = new TmiClient( this.expressApp, languageModelClient, messagesCollection )
+		const tmi = new TmiClient( this.expressApp, messagesCollection, promptQueue )
 
-		const streamlabs = new StreamlabsApiClient( languageModelClient )
+		const streamlabs = new StreamlabsApiClient( promptQueue )
+
+		promptQueue.dispatch( {
+			llm: languageModelClient,
+			sr: songRequest
+		} )
 	}
 
 	async discordBotStandalone() {

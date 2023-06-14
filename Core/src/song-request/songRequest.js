@@ -13,11 +13,11 @@ const dotenv = require( 'dotenv' )
 dotenv.config()
 
 class SongRequest {
-	constructor( expressApp, openAiClient, vtsPlugin, slobs ) {
+	constructor( expressApp, vtsPlugin, slobs, promptQueue ) {
 		this.expressApp = expressApp
-		this.openAiClient = openAiClient
 		this.vtsPlugin = vtsPlugin
 		this.slobs = slobs
+		this.promptQueue = promptQueue
 		this.songName = ''
 		this.songrequestId = 0
 		this.pendingSongRequests = []
@@ -53,7 +53,8 @@ class SongRequest {
 			}
 
 			if ( !req.body.is_approved ) {
-				this.openAiClient.queueUpPrompt( {
+				this.promptQueue.add( {
+					module: 'llm',
 					type: 'chat_message',
 					messages: [
 						{ "role": 'user', "content": `Mori, tell the Twitch chat that you won't be able to sing for the song request "${this.songName}" ${req.body.reason ? `for the reason: "${req.body.reason}"` : ''}, but you are waiting for another song request!` }
@@ -95,50 +96,60 @@ class SongRequest {
 			await this.inferSong()
 			console.log( 'Inference Done' )
 
-			this.slobs.setSongRequestInferNoticeVisibility( false )
-			this.openAiClient.isMoriSpeaking = true
-			this.openAiClient.isSongRequestInProcess = true
-			this.vtsPlugin.triggerHotkey( "BackgroundTransparent" )
-			this.vtsPlugin.triggerHotkey( "SongRequest" )
-			this.vtsPlugin.triggerHotkey( "BodySinging" )
-			this.writeSongNameInFile()
-			this.slobs.setSongNameVisibility( true )
-			this.slobs.muteMic( true );
-			this.slobs.setSubtitleVisibility( false )
-
-			await this.slobs.startRecording()
-			try {
-				await this.headbangOnTempo()
-			} catch ( error ) {
-				console.error( error )
-			}
-			await this.startSong()
-			clearInterval( this.headbangInterval )
-			await this.slobs.stopRecording()
-
-			// Wait for the video to be saved properly after stopping the recording
-			setTimeout( () => {
-				try {
-					DiscordBot.sendSongRequestVideoToChannel( 'post_music', getLatestFileFromDir( process.env.SONG_REQUEST_VIDEOS_DIR ), this.songName )
-				} catch ( error ) {
-					console.log( 'sendSongRequestVideoToChannel', error )
-				}
-			}, 5000 )
-
-			this.vtsPlugin.triggerHotkey( "BackgroundBedroom" )
-			this.vtsPlugin.triggerHotkey( "SongRequest" )
-			this.vtsPlugin.triggerHotkey( "BodySinging" )
-
-			this.openAiClient.softQueueReset()
+			this.promptQueue.add(
+				{
+					module: 'sr',
+				},
+				'high',
+			)
 		} catch ( error ) {
 			console.error( error )
 		}
+	}
+
+	/**
+	 * Fire by prompt queue
+	 */
+	async runProcess() {
+		this.slobs.setSongRequestInferNoticeVisibility( false )
+		this.vtsPlugin.triggerHotkey( "BackgroundTransparent" )
+		this.vtsPlugin.triggerHotkey( "SongRequest" )
+		this.vtsPlugin.triggerHotkey( "BodySinging" )
+		this.writeSongNameInFile()
+		this.slobs.setSongNameVisibility( true )
+		this.slobs.muteMic( true );
+		this.slobs.setSubtitleVisibility( false )
+
+		await this.slobs.startRecording()
+		try {
+			await this.headbangOnTempo()
+		} catch ( error ) {
+			console.error( error )
+		}
+
+		await this.startSong()
+		clearInterval( this.headbangInterval )
+		await this.slobs.stopRecording()
+
+		// Wait for the video to be saved properly after stopping the recording
+		setTimeout( () => {
+			try {
+				DiscordBot.sendSongRequestVideoToChannel( 'post_music', getLatestFileFromDir( process.env.SONG_REQUEST_VIDEOS_DIR ), this.songName )
+			} catch ( error ) {
+				console.log( 'sendSongRequestVideoToChannel', error )
+			}
+		}, 5000 )
+
+		this.vtsPlugin.triggerHotkey( "BackgroundBedroom" )
+		this.vtsPlugin.triggerHotkey( "SongRequest" )
+		this.vtsPlugin.triggerHotkey( "BodySinging" )
+
+		this.promptQueue.softReset()
+
 		this.slobs.setSongNameVisibility( false )
 		this.slobs.muteMic( false );
 		this.slobs.setSubtitleVisibility( true )
 		this.slobs.setSongRequestInferNoticeVisibility( false )
-		this.openAiClient.isMoriSpeaking = false
-		this.openAiClient.isSongRequestInProcess = false
 	}
 
 	async downloadSong() {

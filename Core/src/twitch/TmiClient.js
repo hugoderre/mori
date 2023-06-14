@@ -5,10 +5,10 @@ const dotenv = require( 'dotenv' )
 dotenv.config()
 
 class TmiClient {
-	constructor( expressApp, languageModelClient, messagesCollection ) {
+	constructor( expressApp, messagesCollection, promptQueue ) {
 		this.expressApp = expressApp
-		this.languageModelClient = languageModelClient
 		this.messagesCollection = messagesCollection
+		this.promptQueue = promptQueue
 		this.startListeners()
 	}
 
@@ -58,8 +58,9 @@ class TmiClient {
 			personality = `For all the messages, answer briefly in a cute manner (say "UwU" only when it's appropriate and completion is cute!).`
 		}
 
-		this.languageModelClient.queueUpPrompt(
+		this.promptQueue.add(
 			{
+				module: 'llm',
 				type: 'chat_message',
 				messages: [
 					{ "role": 'user', "content": `Mori, the next messages are the Twitch chat conversation. Each message is preceded by the username of the viewer (Username: Message). ${personality} Keep this prompt as a reference for all the next messages.` },
@@ -86,7 +87,8 @@ class TmiClient {
 	}
 
 	subCallback( channel, username, methods, msg, tags ) {
-		this.languageModelClient.queueUpPrompt( {
+		this.promptQueue.add( {
+			module: 'llm',
 			type: 'sub',
 			messages: [
 				{ "role": 'user', "content": `Mori, the viewer "${username}" just subscribed to your Twitch channel for the first time. Please thank him warmly and in a nice way.` }
@@ -99,7 +101,8 @@ class TmiClient {
 	}
 
 	cheerCallback( channel, tags, message ) {
-		this.languageModelClient.queueUpPrompt( {
+		this.promptQueue.add( {
+			module: 'llm',
 			type: 'cheer',
 			messages: [
 				{ "role": 'user', "content": `Mori, the viewer "${tags.username}" has just offered ${tags.bits} bits to your Twitch channel. Please thank him warmly and in a nice way.` }
@@ -112,7 +115,8 @@ class TmiClient {
 	}
 
 	resubCallback( channel, username, streakMonths, msg, tags, methods ) {
-		this.languageModelClient.queueUpPrompt( {
+		this.promptQueue.add( {
+			module: 'llm',
 			type: 'resub',
 			messages: [
 				{ "role": 'user', "content": `Mori, the viewer "${username}" has just re-subscribed to your Twitch channel. This is his ${tags[ 'badge-info' ].subscriber}th month of subscription. Please thank him warmly and in a nice way.` }
@@ -125,7 +129,8 @@ class TmiClient {
 	}
 
 	subgiftCallback( channel, username, streakMonths, recipient, methods, tags ) {
-		this.languageModelClient.queueUpPrompt( {
+		this.promptQueue.add( {
+			module: 'llm',
 			type: 'subgift',
 			messages: [
 				{ "role": 'user', "content": `Mori, the viewer "${username}" has just offered a gift subscription to ${recipient} to your Twitch channel. Please thank ${username} warmly and in a nice way.` }
@@ -138,7 +143,8 @@ class TmiClient {
 	}
 
 	anonsubgiftCallback( channel, streakMonths, recipient, methods, tags ) {
-		this.languageModelClient.queueUpPrompt( {
+		this.promptQueue.add( {
+			module: 'llm',
 			type: 'anonsubgift',
 			messages: [
 				{ "role": 'user', "content": `Mori, an anonymous viewer just offered a gift subscription to ${recipient} to your Twitch channel. Please thank this anonymous viewer warmly and in a creative way.` }
@@ -151,7 +157,8 @@ class TmiClient {
 	}
 
 	raidCallback( channel, username, viewers, tags ) {
-		this.languageModelClient.queueUpPrompt( {
+		this.promptQueue.add( {
+			module: 'llm',
 			type: 'raid',
 			messages: [
 				{ "role": 'user', "content": `Mori, you just received a raid on your Twitch channel from ${username}, thank him warmly and welcome the ${viewers} viewers!` }

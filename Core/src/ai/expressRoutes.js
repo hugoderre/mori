@@ -2,10 +2,11 @@ const LanguageModelClient = require( './LanguageModelClient.js' )
 const { escapeSpecialChars } = require( '../utils.js' )
 
 class ExpressRoutes {
-	constructor( expressApp, languageModelClient, messagesCollection ) {
+	constructor( expressApp, languageModelClient, messagesCollection, promptQueue ) {
+		this.expressApp = expressApp
 		this.languageModelClient = languageModelClient
 		this.messagesCollection = messagesCollection
-		this.expressApp = expressApp
+		this.promptQueue = promptQueue
 		this.listenCustomPrompt()
 		this.listenTestPrompt()
 		this.listenDiscordBotPrompt()
@@ -18,8 +19,9 @@ class ExpressRoutes {
 				return res.send( 'Wrong body format' )
 			}
 
-			this.languageModelClient.queueUpPrompt(
+			this.promptQueue.add(
 				{
+					module: 'llm',
 					messages: req.body.messages,
 					temperature: req.body.temperature ?? 1,
 					max_tokens: req.body.max_tokens ?? 200,
@@ -63,8 +65,9 @@ class ExpressRoutes {
 				personality = `For all the messages, answer briefly in a cute manner (say "UwU" only when it's appropriate and completion is cute!).`
 			}
 
-			this.languageModelClient.queueUpPrompt(
+			this.promptQueue.add(
 				{
+					module: 'llm',
 					messages: [
 						{ "role": 'user', "content": `Mori, the next messages are the Twitch chat conversation. Each message is preceded by the username of the viewer (Username: Message). ${personality} Keep this prompt as a reference for all the next messages.` },
 						...formattedPreviousUserMessages,
@@ -163,19 +166,18 @@ class ExpressRoutes {
 				return res.send( 'Wrong body format' )
 			}
 
-			// Process the prompt directly if no completion is in process
-			if ( !this.isMoriSpeaking ) {
-				this.runChatCompletion( {
+			this.promptQueue.add(
+				{
+					module: 'llm',
 					messages: req.body.messages,
 					temperature: req.body.temperature ?? 1,
 					max_tokens: req.body.max_tokens ?? 100,
 					system_context: `You are currently practicing Rocket League (reinforcement learning). The next sentences are events in your game, react to them.`,
-				} )
-			} else {
-				return res.send( 'Completion in process' )
-			}
+				},
+				'high'
+			)
 
-			return res.send( 'RLBot prompt done' )
+			return res.send( 'RLBot prompt sent' )
 		} )
 	}
 }
