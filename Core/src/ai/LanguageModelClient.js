@@ -63,7 +63,8 @@ class LanguageModelClient {
 
 		if ( prompt.type === 'chat_message' ) {
 			this.vtsPlugin.triggerHotkey( "Look Chat" )
-			fs.writeFileSync( './assets/slobs/txt/reply_to.txt', 'Reply to ' + promptMessage.slice( 0, 40 ) + '...' )
+			fs.writeFileSync( './assets/slobs/txt/reply_to.txt', 'Reply to ' + ( promptMessage.length >= 40 ? promptMessage.slice( 0, 40 ) + '...' : promptMessage ) )
+			this.slobs.setReplyToVisibility( true )
 		}
 
 		await this.voiceMakerAPI.runTTS( completion )
@@ -75,6 +76,7 @@ class LanguageModelClient {
 			} );
 
 		fs.writeFileSync( './assets/slobs/txt/reply_to.txt', '' )
+		this.slobs.setReplyToVisibility( false )
 
 		if ( prompt.callback ) {
 			prompt.callback( completion )
@@ -86,7 +88,8 @@ class LanguageModelClient {
 	}
 
 	chatCompletionRequest( prompt ) {
-		const completionSystemContext = prompt.system_context ?? "You are answering questions on your Twitch chat and awaiting for song request.";
+		const completionSystemContext = prompt.system_context ?? "You are playing at Rocket League and answering questions on your Twitch chat";
+		// const completionSystemContext = prompt.system_context ?? "You are answering questions on your Twitch chat and awaiting for song request.";
 		const completionPromise = this.api.createChatCompletion( {
 			model: process.env.OPENAI_CHAT_MODEL,
 			messages: [

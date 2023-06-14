@@ -98,7 +98,7 @@ class SlobsWebsocket {
 
 	setReplyToVisibility( isVisible ) {
 		this.setItemVisibility(
-			"SceneItem[\"scene_e43629ca-5841-4906-aaad-961c51a0a2dd\", \"4dfa95f9-17cf-4afd-90d3-a49eeebf7a94\", \"text_gdiplus_05851119-7baa-4262-bb28-27df0f182ab3\"]",
+			"SceneItem[\"scene_37ab87f9-e1c1-430b-9864-29c0388be62a\", \"f152aced-44cf-4949-984b-4c1f6687342d\", \"text_gdiplus_05851119-7baa-4262-bb28-27df0f182ab3\"]",
 			isVisible
 		)
 	}
