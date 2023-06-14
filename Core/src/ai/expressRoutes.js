@@ -26,7 +26,7 @@ class ExpressRoutes {
 					temperature: req.body.temperature ?? 1,
 					max_tokens: req.body.max_tokens ?? 200,
 					username: req.body.username ?? '',
-					system_context: 'This next prompt is a custom prompt from your creator. Speak as if your completion came from your free will, without saying that it comes from your creator.',
+					system_context: req.body.system_context ?? 'This next prompt is a custom prompt from your creator. Speak as if your completion came from your free will, without saying that it comes from your creator.',
 					callback: async ( completion ) => {
 						const newMessage = {
 							timestamp: Date.now(),
@@ -171,13 +171,25 @@ class ExpressRoutes {
 					module: 'llm',
 					messages: req.body.messages,
 					temperature: req.body.temperature ?? 1,
-					max_tokens: req.body.max_tokens ?? 100,
-					system_context: `You are currently practicing Rocket League (reinforcement learning). The next sentences are events in your game, react to them.`,
+					max_tokens: req.body.max_tokens ?? 200,
+					username: req.body.username ?? '',
+					callback: async ( completion ) => {
+						const newMessage = {
+							timestamp: Date.now(),
+							message: req.body.messages[ 0 ].content,
+							response: completion,
+						}
+						await this.messagesCollection.pushMessageUpsert(
+							'twitch_chat_conversation',
+							newMessage,
+							6
+						)
+					}
 				},
 				'high'
 			)
 
-			return res.send( 'RLBot prompt sent' )
+			return res.send( 'Custom prompt done' )
 		} )
 	}
 }

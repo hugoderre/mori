@@ -2,6 +2,7 @@ import numpy as np
 import os
 from rlgym.envs import Match
 from rlgym.utils.action_parsers import DiscreteAction
+from rlgym.gamelaunch import LaunchPreference
 from stable_baselines3 import PPO
 from stable_baselines3.common.callbacks import CheckpointCallback
 from stable_baselines3.common.vec_env import VecMonitor, VecNormalize, VecCheckNan
@@ -66,7 +67,7 @@ if __name__ == '__main__':  # Required for multiprocessing
             game_speed=1,  # 1 = 120 FPS, 2 = 60 FPS, 3 = 40 FPS, 4 = 30 FPS
         )
 
-    env = SB3MultipleInstanceEnv(get_match, num_instances)            # Start 1 instances, waiting 60 seconds between each
+    env = SB3MultipleInstanceEnv(get_match, num_instances, launch_preference=LaunchPreference.STEAM)            # Start 1 instances, waiting 60 seconds between each
     env = VecCheckNan(env)                                # Optional
     env = VecMonitor(env)                                 # Recommended, logs mean reward and ep_len to Tensorboard
     env = VecNormalize(env, norm_obs=False, gamma=gamma)  # Highly recommended, normalizes rewards

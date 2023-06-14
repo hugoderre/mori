@@ -15,12 +15,13 @@ class CustomEventReward(EventReward):
 		diff_values = new_values - old_values
 		diff_values[diff_values < 0] = 0  # We only care about increasing values
 		
+		
 		if (diff_values[1] != 0 and player.team_num == BLUE_TEAM):
-			mori_request.send("You scored a goal. React narcissistically.")
+			mori_request.send("Oh my god you scored a goal. What a goal.")
 			pass
 
 		if (diff_values[2] != 0 and player.team_num == BLUE_TEAM):
-			mori_request.send("Your opponent has scored a goal. React in a sarcastic way.")
+			mori_request.send("Your opponent has scored a goal. Nooooo.")
 			pass
 
 		# if (diff_values[5] != 0 and player.team_num == BLUE_TEAM):
