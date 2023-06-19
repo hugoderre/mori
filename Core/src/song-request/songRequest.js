@@ -88,13 +88,15 @@ class SongRequest {
 	async buildSong() {
 		try {
 			await this.downloadSong()
+			console.log( 'SR: Song Downloaded' )
 			await this.separateSong()
+			console.log( 'SR: Song Separated' )
 
 			this.slobs.setSongRequestInferNoticeVisibility( true )
 
-			console.log( 'Start Inference' )
+			console.log( 'SR: Start Inference' )
 			await this.inferSong()
-			console.log( 'Inference Done' )
+			console.log( 'SR: Inference Done' )
 
 			this.promptQueue.add(
 				{
@@ -167,7 +169,6 @@ class SongRequest {
 						.format( 'wav' )
 						.save( 'src/song-request/songs/base_song.wav' )
 						.on( 'end', () => {
-							console.log( 'Conversion terminée.' )
 							resolve()
 						} )
 				} )
