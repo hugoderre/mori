@@ -55,7 +55,7 @@ class TmiClient {
 		if ( personalityRandomizer < 0.8 ) {
 			personality = `For all the messages, answer briefly in a sarcastic and funny manner. You like to tease people.`
 		} else {
-			personality = `For all the messages, answer briefly in a cute manner (say "UwU" only when it's appropriate and completion is cute!).`
+			personality = `For all the messages, answer briefly in a cute manner.`
 		}
 
 		this.promptQueue.add(
@@ -78,7 +78,7 @@ class TmiClient {
 					await this.messagesCollection.pushMessageUpsert(
 						'twitch_chat_conversation',
 						newMessage,
-						6
+						9
 					)
 				}
 			},
